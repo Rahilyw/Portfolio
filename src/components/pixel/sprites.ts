@@ -1,45 +1,7 @@
 /**
  * Hand-pixeled sprite maps. Legend per sprite; "." is transparent.
+ * (The cursor surfer is painted procedurally in surferSheet.ts.)
  */
-
-/* ---------- surfer riding a wave (cursor sprite) ---------- */
-
-export const surferPalette: Record<string, string> = {
-  h: "#5b3a1e", // hair
-  s: "#b96f3d", // skin
-  d: "#9c5a2e", // skin shade
-  g: "#16a34a", // shorts
-  G: "#0d7a38", // shorts shade
-  b: "#ffd23e", // board top
-  o: "#ff9d1b", // board rail
-  W: "#ffffff", // foam
-  t: "#35c4c8", // wave teal
-  T: "#1d9fb0", // wave deep
-  w: "#9ee8ec", // spray
-};
-
-export const surferRows = [
-  "...........hhhh...........",
-  "..........hhhhhh..........",
-  "..........hsssdh..........",
-  "..........ssssss..........",
-  "...w.......ssss...........",
-  "..wW........ss............",
-  ".wWW..sssssssssssss.......",
-  "wWWt.sss...ssss...sss.....",
-  "WWtt.......gggg...........",
-  "WTtt......gggggg..........",
-  "WTtt......gGggGg..........",
-  "WTtt......gg..gg..........",
-  ".WTtt.....gg..gg..........",
-  ".WTtt.....ss..ss..........",
-  "..WTtt...ss....ss.........",
-  "..WWttbbbbbbbbbbbbbbb.....",
-  "...Wobbbbbbbbbbbbbbbbbo...",
-  "...Wooooooooooooooooooo...",
-  "..wWWttTTttttTTttttTtt....",
-  "...wWttttttttttttttw......",
-];
 
 /* ---------- islands ---------- */
 
