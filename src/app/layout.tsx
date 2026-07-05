@@ -6,6 +6,8 @@ import {
   Titan_One,
   Pacifico,
   Permanent_Marker,
+  Bebas_Neue,
+  Newsreader,
 } from "next/font/google";
 import "./globals.css";
 
@@ -43,6 +45,19 @@ const marker = Permanent_Marker({
   weight: "400",
 });
 
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const newsreader = Newsreader({
+  variable: "--font-editorial",
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
   title: "Rahil Wijeyesekera — Portfolio",
   description:
@@ -66,7 +81,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${titanOne.variable} ${pacifico.variable} ${marker.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${titanOne.variable} ${pacifico.variable} ${marker.variable} ${bebasNeue.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

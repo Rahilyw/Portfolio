@@ -4,6 +4,7 @@ export const site = {
   github: "https://github.com/Rahilyw",
   linkedin: "https://linkedin.com/in/rahil-wijeyesekera",
   email: "rahilwijeyesekera@uvic.ca",
+  resume: "/resume.pdf", // drop your PDF at public/resume.pdf
 };
 
 export type Island = {
@@ -22,7 +23,7 @@ export const islands: Island[] = [
   { slug: "skills", label: "Skills", blurb: "My toolbox", x: 66, y: 26, variant: "palm" },
   { slug: "education", label: "Education", blurb: "Where I've studied", x: 86, y: 12, variant: "mountain" },
   { slug: "achievements", label: "Achievements", blurb: "Buoys & trophies", x: 32, y: 67, variant: "hut" },
-  { slug: "contact", label: "Contact", blurb: "Message in a bottle", x: 72, y: 66, variant: "bottle" },
+  { slug: "about-me", label: "About Me", blurb: "Get to know me", x: 72, y: 66, variant: "bottle" },
 ];
 
 export type Project = {
@@ -165,12 +166,22 @@ export const education = [
   },
 ];
 
-export const experience = [
+export type Experience = {
+  role: string;
+  company: string;
+  location: string;
+  period: string;
+  points: string[];
+  stamp: string;
+};
+
+export const experience: Experience[] = [
   {
     role: "Technical Co-founder",
     company: "Serendira",
     location: "Remote (San Francisco, USA)",
     period: "Dec 2025 – Present",
+    stamp: "TECH",
     points: [
       "Lead all engineering for a talent platform connecting enterprises with remote professionals across Asia.",
       "Shipped the platform end-to-end as a developer: design, build, deployment, support.",
@@ -178,13 +189,36 @@ export const experience = [
     ],
   },
   {
+    role: "Director of Sport",
+    company: "UVic Engineering & CS Society",
+    location: "Victoria, BC",
+    period: "2024 – Present",
+    stamp: "EXEC",
+    points: [
+      "Elected director representing CS and engineering students within the ECSS.",
+      "Organise sport events and build community initiatives for engineering students.",
+    ],
+  },
+  {
     role: "Business Design Intern",
     company: "Innovation Quotient",
     location: "Sri Lanka",
     period: "Jun 2024 – Sep 2024",
+    stamp: "IQ",
     points: [
       "Conducted market and competitor research for enterprise clients (DFCC Bank, SLT-Mobitel, UFS Auto).",
       "Turned research into data-driven growth recommendations presented to and approved by client boards.",
+    ],
+  },
+  {
+    role: "Administrative Front-of-House",
+    company: "SUBtext Bookstore — UVic",
+    location: "Victoria, BC",
+    period: "2023 – 2024",
+    stamp: "OPS",
+    points: [
+      "Ran customer operations and front desk at UVic's campus bookstore.",
+      "Managed inventory flow and the day-to-day operational requirements of the store.",
     ],
   },
 ];

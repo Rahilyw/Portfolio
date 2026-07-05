@@ -21,6 +21,11 @@
   --peach: #ffd9b0;
   --hotpink: #f72585;
   --lime: #a4d92c;
+  /* magazine palette */
+  --parchment: #F2EDD7;
+  --navy-dark: #0A2D4E;
+  --neon-yellow: #FFE000;
+  --coral-hot: #FF5F35;
 }
 
 @theme inline {
@@ -43,6 +48,10 @@
   --color-peach: var(--peach);
   --color-hotpink: var(--hotpink);
   --color-lime: var(--lime);
+  --color-parchment: var(--parchment);
+  --color-navy-dark: var(--navy-dark);
+  --color-neon-yellow: var(--neon-yellow);
+  --color-coral-hot: var(--coral-hot);
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-retro);
   --font-mono: var(--font-geist-mono);
@@ -73,6 +82,14 @@ body {
 
 .font-marker {
   font-family: var(--font-marker), cursive;
+}
+
+.font-bebas {
+  font-family: var(--font-bebas), var(--font-retro), sans-serif;
+}
+
+.font-editorial {
+  font-family: var(--font-editorial), Georgia, serif;
 }
 
 /* magazine cover-line marquee */

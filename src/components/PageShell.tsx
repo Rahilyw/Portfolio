@@ -1,67 +1,34 @@
 import Link from "next/link";
 import { site } from "@/data/content";
-import { Hibiscus, Starfish, WaveBadge, SunSpiral, SharkSign, CircleBadge } from "@/components/Stickers";
+import { Hibiscus, Starfish, CircleBadge } from "@/components/Stickers";
 
-/**
- * Shared layout for section pages, styled like a vintage surf-magazine
- * cover: sunset header with a spinning sunburst, stacked neon-shadow
- * headline with a script accent, scattered sticker decals, and a
- * scrolling cover-line marquee.
- */
 export default function PageShell({
   title,
   emoji,
   subtitle,
   accent = "surf's up!",
+  section,
   children,
 }: {
   title: string;
   emoji: string;
   subtitle: string;
   accent?: string;
+  section?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-[100svh] flex-col bg-cream">
-      <header
-        className="relative overflow-hidden px-6 pb-16 pt-10 text-center"
-        style={{
-          background:
-            "linear-gradient(to bottom, #ffe8c9 0%, #ffd2a6 45%, #ffb183 80%, #ff9e74 100%)",
-        }}
-      >
-        {/* retro sunburst, slowly spinning */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[56%] -translate-x-1/2 -translate-y-1/2 opacity-90"
-          style={{ animation: "sun-spin 90s linear infinite" }}
-        >
-          <Sunburst />
+    <div className="flex min-h-[100svh] flex-col bg-parchment">
+      <header className="relative overflow-hidden bg-parchment pb-12 pt-0 text-center">
+        {/* magazine issue strip */}
+        <div className="flex items-center justify-between bg-navy-dark px-6 py-2">
+          <span className="font-bebas text-sm tracking-[3px] text-neon-yellow">SURF &amp; CODE QUARTERLY</span>
+          <span className="font-bebas text-sm tracking-[2px] text-white/50">ISSUE 01 · SUMMER 2026</span>
+          <span className="font-bebas text-sm tracking-[3px] text-neon-yellow">{(section ?? title).toUpperCase()}</span>
         </div>
 
-        {/* sticker scatter */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[6%] top-[30%] -rotate-12 drop-shadow-[3px_3px_0_rgba(29,53,87,0.35)]">
-            <Hibiscus />
-          </div>
-          <div className="absolute right-[7%] top-[26%] rotate-[10deg] drop-shadow-[3px_3px_0_rgba(29,53,87,0.35)]">
-            <Starfish />
-          </div>
-          <div className="absolute bottom-[14%] left-[12%] hidden rotate-[7deg] drop-shadow-[3px_3px_0_rgba(29,53,87,0.35)] md:block">
-            <WaveBadge />
-          </div>
-          <div className="absolute bottom-[12%] right-[10%] hidden -rotate-6 drop-shadow-[3px_3px_0_rgba(29,53,87,0.35)] md:block">
-            <SharkSign />
-          </div>
-          <div className="absolute left-[24%] top-[8%] hidden -rotate-6 lg:block">
-            <SunSpiral size={60} />
-          </div>
-          <div className="absolute right-[22%] top-[6%] hidden rotate-6 drop-shadow-[3px_3px_0_rgba(29,53,87,0.35)] lg:block">
-            <CircleBadge size={84} />
-          </div>
-        </div>
-
-        <nav className="relative z-10 mx-auto flex max-w-4xl items-center justify-between">
+        {/* nav */}
+        <nav className="relative z-10 mx-auto flex max-w-4xl items-center justify-between px-6 pt-5">
           <Link
             href="/"
             className="sticker px-4 py-2 font-display text-sm text-navy transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
@@ -78,39 +45,53 @@ export default function PageShell({
           </a>
         </nav>
 
-        {/* magazine kicker */}
-        <p className="font-marker relative z-10 mt-8 text-sm tracking-wide text-navy/80">
+        {/* minimal sticker scatter */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 top-8">
+          <div className="absolute left-[5%] top-[38%] -rotate-12 opacity-80 drop-shadow-[3px_3px_0_rgba(10,45,78,0.25)]">
+            <Hibiscus size={58} />
+          </div>
+          <div className="absolute right-[6%] top-[32%] rotate-[10deg] opacity-80 drop-shadow-[3px_3px_0_rgba(10,45,78,0.25)]">
+            <Starfish size={52} />
+          </div>
+          <div className="absolute right-[18%] top-[8%] hidden rotate-6 opacity-60 lg:block">
+            <CircleBadge size={72} />
+          </div>
+        </div>
+
+        {/* kicker */}
+        <p className="font-marker relative z-10 mt-10 text-sm tracking-wide text-navy/70">
           ☼ RAHIL&apos;S SURF LOG — VOL. 1 ☼
         </p>
 
+        {/* headline */}
         <h1
-          className="font-display relative z-10 mt-2 text-5xl uppercase text-white md:text-7xl"
-          style={{
-            textShadow: "3px 3px 0 var(--hotpink), 7px 7px 0 var(--navy)",
-            WebkitTextStroke: "2px var(--navy)",
-          }}
+          className="font-bebas relative z-10 mt-2 text-7xl uppercase text-navy md:text-9xl"
+          style={{ textShadow: "3px 3px 0 var(--neon-yellow), 6px 6px 0 var(--navy-dark)" }}
         >
-          <span aria-hidden="true">{emoji} </span>
+          <span aria-hidden="true" className="mr-2 text-[0.55em]">{emoji}</span>
           {title}
         </h1>
 
-        {/* script accent, Roxy-poster style */}
+        {/* script accent */}
         <p
           aria-hidden="true"
-          className="font-script relative z-10 -mt-2 -rotate-3 text-2xl text-hotpink md:text-3xl"
-          style={{ textShadow: "2px 2px 0 #fffdf6" }}
+          className="font-script relative z-10 -mt-1 -rotate-2 text-2xl text-coral md:text-3xl"
+          style={{ textShadow: "2px 2px 0 var(--parchment)" }}
         >
           {accent}
         </p>
 
-        <p className="relative z-10 mx-auto mt-3 max-w-xl font-medium text-navy/90">{subtitle}</p>
+        {/* subtitle */}
+        <p className="font-editorial relative z-10 mx-auto mt-3 max-w-xl text-lg italic text-navy/70">
+          {subtitle}
+        </p>
       </header>
 
-      {/* scrolling cover-line marquee */}
-      <div className="overflow-hidden border-y-4 border-navy bg-navy py-1.5" aria-hidden="true">
+      {/* scrolling marquee */}
+      <div className="overflow-hidden border-y-4 border-navy-dark bg-navy-dark py-1.5" aria-hidden="true">
         <div className="marquee-track flex w-max">
           {[0, 1].map((copy) => (
-            <span key={copy} className="font-display whitespace-nowrap text-sm tracking-[0.2em] text-cream">
+            <span key={copy} className="font-bebas whitespace-nowrap text-sm tracking-[0.2em] text-parchment">
               {Array.from({ length: 6 })
                 .map(() => `${title.toUpperCase()} · SURF · BUILD · REPEAT · `)
                 .join("")}
@@ -138,28 +119,5 @@ export default function PageShell({
         </p>
       </footer>
     </div>
-  );
-}
-
-function Sunburst() {
-  // 16 triangular rays around a warm sun disc, vintage-print style
-  const rays = Array.from({ length: 16 }, (_, i) => {
-    const angle = (i * 360) / 16;
-    return (
-      <path
-        key={i}
-        d="M0 -74 L11 -108 L-11 -108 Z"
-        fill={i % 2 === 0 ? "#f2b134" : "#f4793b"}
-        transform={`rotate(${angle})`}
-      />
-    );
-  });
-  return (
-    <svg width="360" height="360" viewBox="-180 -180 360 360">
-      <g opacity="0.85">{rays}</g>
-      <circle r="64" fill="#f2b134" />
-      <circle r="64" fill="none" stroke="#e76f51" strokeWidth="5" />
-      <circle r="50" fill="none" stroke="#e76f51" strokeWidth="2.5" opacity="0.6" />
-    </svg>
   );
 }

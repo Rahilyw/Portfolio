@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "B.Sc. Computer Science at the University of Victoria, with an international exchange at the National University of Singapore.",
 };
 
+const accents = ["bg-navy-dark", "bg-coral"];
+
 export default function EducationPage() {
   return (
     <PageShell
@@ -16,25 +18,29 @@ export default function EducationPage() {
       accent="study waves"
       subtitle="Where I've studied — from Victoria, BC to Singapore."
     >
-      <ol className="relative space-y-8 border-l-[3px] border-navy/30 pl-6">
+      <div className="space-y-8">
         {education.map((e, i) => (
-          <li key={e.school} className="relative">
-            <span
-              className="absolute -left-[33px] top-1.5 h-4 w-4 rounded-full border-[3px] border-navy bg-mustard"
-              aria-hidden="true"
-            />
-            <article className={`sticker p-6 ${i % 2 ? "-rotate-[0.5deg]" : "rotate-[0.5deg]"}`}>
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="font-display text-xl text-navy">{e.school}</h2>
-                <p className="font-display text-sm text-coral">{e.period}</p>
-              </div>
-              <p className="mt-1 font-medium text-navy/85">{e.degree}</p>
-              <p className="text-sm text-navy/60">{e.location}</p>
-              <p className="mt-3 text-sm text-navy/80">{e.details}</p>
-            </article>
-          </li>
+          <article
+            key={e.school}
+            className="overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.08)]"
+            style={{ transform: `rotate(${i % 2 ? "-0.4deg" : "0.4deg"})` }}
+          >
+            <div className={`flex items-center justify-between px-6 py-3 ${accents[i % accents.length]}`}>
+              <span className="font-bebas text-lg tracking-[3px] text-neon-yellow">EDUCATION</span>
+              <span className="font-sans text-xs font-bold uppercase tracking-widest text-white/60">
+                {e.period}
+              </span>
+            </div>
+            <div className="bg-white p-6">
+              <h2 className="font-bebas text-4xl leading-none text-navy">{e.school.toUpperCase()}</h2>
+              <p className="font-editorial mt-1 text-xl italic text-coral">{e.degree}</p>
+              <div className="mt-2 h-0.5 w-10 bg-neon-yellow" />
+              <p className="mt-2 text-sm text-navy/55">{e.location}</p>
+              <p className="mt-3 text-sm leading-relaxed text-navy/80">{e.details}</p>
+            </div>
+          </article>
         ))}
-      </ol>
+      </div>
     </PageShell>
   );
 }
