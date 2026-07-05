@@ -21,7 +21,7 @@ export const islands: Island[] = [
   { slug: "experience", label: "Experience", blurb: "Where I've worked", x: 40, y: 14, variant: "lighthouse" },
   { slug: "skills", label: "Skills", blurb: "My toolbox", x: 66, y: 26, variant: "palm" },
   { slug: "education", label: "Education", blurb: "Where I've studied", x: 86, y: 12, variant: "mountain" },
-  { slug: "achievements", label: "Achievements", blurb: "Buoys & trophies", x: 30, y: 62, variant: "hut" },
+  { slug: "achievements", label: "Achievements", blurb: "Buoys & trophies", x: 32, y: 67, variant: "hut" },
   { slug: "contact", label: "Contact", blurb: "Message in a bottle", x: 72, y: 66, variant: "bottle" },
 ];
 
