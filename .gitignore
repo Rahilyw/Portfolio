@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# vendored libraries — install via npm instead (e.g. `npm install three`)
+/three.js-master/
