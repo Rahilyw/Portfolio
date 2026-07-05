@@ -126,7 +126,7 @@ export default function Surfer() {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!finePointer || reduceMotion) return;
 
-    setSheetUrl(drawSurferSheet().toDataURL());
+    const sheetRaf = requestAnimationFrame(() => setSheetUrl(drawSurferSheet().toDataURL()));
 
     const wakeCanvas = wakeRef.current;
     const wakeCtx = wakeCanvas?.getContext("2d");
@@ -194,6 +194,7 @@ export default function Surfer() {
     return () => {
       window.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(sheetRaf);
     };
   }, []);
 

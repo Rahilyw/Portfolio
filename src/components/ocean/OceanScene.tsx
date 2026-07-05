@@ -32,7 +32,7 @@ export default function OceanScene() {
           {site.tagline}
         </p>
         <p className="mt-5 border-2 border-ink bg-white/90 px-4 py-1.5 font-pixel text-sm text-ink shadow-[3px_3px_0_rgba(8,51,68,0.45)]">
-          🏄 Surf around — click an island to explore
+          🏄 Surf around — click an island, whale, or ship to explore
         </p>
       </header>
 
@@ -40,17 +40,15 @@ export default function OceanScene() {
       <div className="absolute inset-x-0 bottom-0 z-10 h-[58%]">
         <Dolphin />
 
-        {islands.map((island, idx) => (
+        {islands.map((island) => (
           <Link
             key={island.slug}
             href={`/${island.slug}`}
             className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none"
             style={{ left: `${island.x}%`, top: `${island.y}%` }}
           >
-            <div
-              className="animate-bob-slow flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110"
-              style={{ animationDelay: `${idx * 0.55}s`, animationDuration: `${4 + (idx % 3) * 0.7}s` }}
-            >
+            {/* islands sit still — the animated surf around them provides the motion */}
+            <div className="flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110">
               <span className={`mb-1.5 ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
                 {island.label}
               </span>
@@ -61,6 +59,42 @@ export default function OceanScene() {
             </div>
           </Link>
         ))}
+
+        {/* whale → LinkedIn (left), pirate ship → GitHub (right) */}
+        <a
+          href={site.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none"
+          style={{ left: "11%", top: "72%" }}
+        >
+          <div
+            className="animate-bob-slow flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110"
+            style={{ animationDuration: "5.2s" }}
+          >
+            <span className={`mb-1.5 ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
+              LinkedIn
+            </span>
+            <IslandSprite variant="whale" />
+          </div>
+        </a>
+        <a
+          href={site.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none"
+          style={{ left: "89%", top: "74%" }}
+        >
+          <div
+            className="animate-bob-slow flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110"
+            style={{ animationDelay: "0.8s", animationDuration: "4.6s" }}
+          >
+            <span className={`mb-1.5 ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
+              GitHub
+            </span>
+            <IslandSprite variant="ship" />
+          </div>
+        </a>
       </div>
 
       {/* surfer follows the cursor (desktop, motion-safe only) */}
@@ -69,16 +103,6 @@ export default function OceanScene() {
       {/* bottom-left controls */}
       <div className="absolute bottom-4 left-4 z-30">
         <SoundToggle />
-      </div>
-
-      {/* bottom-right quick links */}
-      <div className="absolute bottom-4 right-4 z-30 flex gap-3 text-sm">
-        <a href={site.github} target="_blank" rel="noopener noreferrer" className={retroChip}>
-          GitHub
-        </a>
-        <a href={site.linkedin} target="_blank" rel="noopener noreferrer" className={retroChip}>
-          LinkedIn
-        </a>
       </div>
     </main>
   );
