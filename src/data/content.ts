@@ -14,14 +14,14 @@ export type Island = {
   /** percentage position inside the ocean band */
   x: number;
   y: number;
-  variant: "palm" | "mountain" | "lighthouse" | "volcano" | "hut" | "bottle";
+  variant: "palm" | "mountain" | "lighthouse" | "volcano" | "hut" | "bottle" | "ship";
 };
 
 export const islands: Island[] = [
   { slug: "projects", label: "Projects", blurb: "Things I've built", x: 16, y: 30, variant: "volcano" },
   { slug: "experience", label: "Experience", blurb: "Where I've worked", x: 40, y: 14, variant: "lighthouse" },
   { slug: "skills", label: "Skills", blurb: "My toolbox", x: 66, y: 26, variant: "palm" },
-  { slug: "education", label: "Education", blurb: "Where I've studied", x: 86, y: 12, variant: "mountain" },
+  { slug: "education", label: "Education", blurb: "Where I've studied", x: 86, y: 12, variant: "ship" },
   { slug: "achievements", label: "Achievements", blurb: "Buoys & trophies", x: 32, y: 67, variant: "hut" },
   { slug: "about-me", label: "About Me", blurb: "Get to know me", x: 72, y: 66, variant: "bottle" },
 ];

@@ -1,6 +1,7 @@
 /**
- * Procedural painters for the ocean-scene sprites: the six section islands
- * plus the whale (LinkedIn) and pirate ship (GitHub) monuments.
+ * Procedural painters for the ocean-scene sprites: the section islands
+ * (including the pirate ship that fronts the Education section) plus the
+ * standalone whale sprite.
  *
  * Same pipeline as the cursor surfer (surferSheet.ts): every sprite is drawn
  * with canvas vector shapes at 4x supersample, downscaled to its art-pixel
@@ -32,7 +33,7 @@ export const SPRITE_SIZES: Record<SpriteVariant, [number, number]> = {
   hut: [120, 90],
   bottle: [48, 64],
   whale: [68, 48],
-  ship: [84, 68],
+  ship: [114, 92],
 };
 
 /**
@@ -48,7 +49,7 @@ const DRAW_SCALE: Record<SpriteVariant, number> = {
   hut: 1.25,
   bottle: 1,
   whale: 1,
-  ship: 1,
+  ship: 1.35,
 };
 
 const TAU = Math.PI * 2;
@@ -1148,6 +1149,13 @@ function drawShip(g: Ctx) {
   g.beginPath();
   g.arc(7.5, 40.5, 2, -0.5 * Math.PI, 0.75 * Math.PI);
   g.stroke();
+
+  // crow's-nest lookout barrel near the mainmast top
+  poly(g, [[34.4, 11], [41.6, 11], [40.4, 7.6], [35.6, 7.6]], "#6b4226");
+  poly(g, [[40.4, 7.6], [41.6, 11], [40.2, 11], [39.4, 7.6]], "#4c2f16", 0.8); // shaded side
+  stroke(g, [[34.7, 9.2], [41.3, 9.2]], 0.5, "#4c2f16", 0.8); // hoop band
+  for (let i = 0; i < 3; i++) stroke(g, [[36 + i * 1.9, 7.6], [36 + i * 1.9, 11]], 0.35, "#3a2c22", 0.55); // staves
+  dot(g, 38, 6.4, 0.9, "#e8ddc2", 0.9); // lookout's head peeking over the rim
 
   // waterline shallows tint (foam is animated separately)
   g.globalAlpha = 0.4;

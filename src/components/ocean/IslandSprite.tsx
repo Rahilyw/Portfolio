@@ -14,9 +14,9 @@ import {
 const SPLASH_FRAME_MS = 150;
 
 /**
- * Detailed pixel-art scenery sprites — islands, the message bottle, and the
- * whale / pirate-ship link monuments. Painted procedurally on the client
- * (see islandArt.ts) and upscaled nearest-neighbor for the chunky look.
+ * Detailed pixel-art scenery sprites — islands, the pirate ship, the message
+ * bottle, and the whale. Painted procedurally on the client (see islandArt.ts)
+ * and upscaled nearest-neighbor for the chunky look.
  *
  * Each sprite carries an animated surf layer: an 8-frame hard-pixel splash
  * sheet playing on a CSS steps() loop, so waves lap and spurt against the

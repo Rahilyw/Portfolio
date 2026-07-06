@@ -32,7 +32,7 @@ export default function OceanScene() {
           {site.tagline}
         </p>
         <p className="mt-5 border-2 border-ink bg-white/90 px-4 py-1.5 font-pixel text-sm text-ink shadow-[3px_3px_0_rgba(8,51,68,0.45)]">
-          🏄 Surf around — click an island, whale, or ship to explore
+          🏄 Surf around — click an island to explore
         </p>
       </header>
 
@@ -59,42 +59,6 @@ export default function OceanScene() {
             </div>
           </Link>
         ))}
-
-        {/* whale → LinkedIn (left), pirate ship → GitHub (right) */}
-        <a
-          href={site.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none"
-          style={{ left: "11%", top: "72%" }}
-        >
-          <div
-            className="animate-bob-slow flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110"
-            style={{ animationDuration: "5.2s" }}
-          >
-            <span className={`mb-1.5 ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
-              LinkedIn
-            </span>
-            <IslandSprite variant="whale" />
-          </div>
-        </a>
-        <a
-          href={site.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none"
-          style={{ left: "89%", top: "74%" }}
-        >
-          <div
-            className="animate-bob-slow flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110"
-            style={{ animationDelay: "0.8s", animationDuration: "4.6s" }}
-          >
-            <span className={`mb-1.5 ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
-              GitHub
-            </span>
-            <IslandSprite variant="ship" />
-          </div>
-        </a>
       </div>
 
       {/* surfer follows the cursor (desktop, motion-safe only) */}
