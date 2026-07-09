@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { nightness } from "./dayNight";
 
 /**
  * Full-viewport pixel-art ocean, PS2-era style: the whole scene is rendered
@@ -11,6 +12,9 @@ import { useEffect, useRef } from "react";
  * - Water: depth bands + two layered traveling sine fields quantized into
  *   light streaks / dark troughs / white foam crests
  * - Shimmer: hash-based sparkle pixels that twinkle at a retro ~5fps
+ * - Day/night: palettes blend on the shared 10-minute cycle (dayNight.ts),
+ *   passing through a warm sunset wash; at night the sky fills with a
+ *   hash-seeded twinkling starfield
  */
 
 const PX = 5; // css pixels per art pixel
@@ -25,13 +29,34 @@ const hex = (h: string): RGB => [
   parseInt(h.slice(5, 7), 16),
 ];
 
-const SKY: RGB[] = ["#2e63f7", "#2f77f5", "#2f8cee", "#39a2e6", "#4db8e0"].map(hex);
-const SEA: RGB[] = ["#1e63c8", "#2b7fd4", "#2fa3d8", "#37c4d4", "#45d8c8"].map(hex);
-const SEA_LIGHT: RGB[] = ["#2b7fd4", "#2fa3d8", "#4fc9de", "#5fdcd8", "#7ce8d4"].map(hex);
-const SEA_DARK: RGB[] = ["#174f9e", "#1e63c8", "#2b7fd4", "#2fa3c0", "#37c4b4"].map(hex);
-const FOAM: RGB = hex("#e9fbff");
-const SPARKLE: RGB = hex("#ffffff");
-const HORIZON_LINE: RGB = hex("#1b55a8");
+// day palettes
+const SKY_D: RGB[] = ["#2e63f7", "#2f77f5", "#2f8cee", "#39a2e6", "#4db8e0"].map(hex);
+const SEA_D: RGB[] = ["#1e63c8", "#2b7fd4", "#2fa3d8", "#37c4d4", "#45d8c8"].map(hex);
+const SEA_LIGHT_D: RGB[] = ["#2b7fd4", "#2fa3d8", "#4fc9de", "#5fdcd8", "#7ce8d4"].map(hex);
+const SEA_DARK_D: RGB[] = ["#174f9e", "#1e63c8", "#2b7fd4", "#2fa3c0", "#37c4b4"].map(hex);
+const FOAM_D: RGB = hex("#e9fbff");
+const SPARKLE_D: RGB = hex("#ffffff");
+const HORIZON_D: RGB = hex("#1b55a8");
+
+// night palettes
+const SKY_N: RGB[] = ["#050a24", "#081130", "#0c1a40", "#12234e", "#1a2f5c"].map(hex);
+const SEA_N: RGB[] = ["#0a1c46", "#0e2654", "#123260", "#173e62", "#1d4a60"].map(hex);
+const SEA_LIGHT_N: RGB[] = ["#14305e", "#1a3c6c", "#224c74", "#2a5a74", "#356a72"].map(hex);
+const SEA_DARK_N: RGB[] = ["#060f30", "#0a1c46", "#0e2654", "#122e4e", "#173846"].map(hex);
+const FOAM_N: RGB = hex("#a8bfd8");
+const SPARKLE_N: RGB = hex("#e8f0fa");
+const HORIZON_N: RGB = hex("#081432");
+
+// sunset wash, strongest mid-transition (indigo top → amber horizon)
+const SKY_DUSK: RGB[] = ["#3e3f8f", "#7c4f9e", "#c95d84", "#f07a5a", "#ffb257"].map(hex);
+const DUSK_GLINT: RGB = hex("#ff9a5e");
+const STAR: RGB = hex("#ebf0ff");
+
+const mixRGB = (a: RGB, b: RGB, u: number): RGB => [
+  a[0] + (b[0] - a[0]) * u,
+  a[1] + (b[1] - a[1]) * u,
+  a[2] + (b[2] - a[2]) * u,
+];
 
 // integer hash → [0, 1023]
 const hash = (x: number, y: number, t: number) => {
@@ -70,6 +95,21 @@ export default function WaveCanvas() {
       const horizonY = Math.floor(h * HORIZON);
       const tq = Math.floor(t * 5); // quantized time for retro twinkle
 
+      // day/night blend for this frame (shared wall-clock cycle)
+      const n = nightness(Date.now());
+      const dusk = Math.sin(Math.PI * n); // peaks mid-transition
+      const SKY = SKY_D.map((c, i) =>
+        mixRGB(mixRGB(c, SKY_N[i], n), SKY_DUSK[i], dusk * 0.6)
+      );
+      const SEA = SEA_D.map((c, i) => mixRGB(c, SEA_N[i], n));
+      const SEA_LIGHT = SEA_LIGHT_D.map((c, i) =>
+        mixRGB(mixRGB(c, SEA_LIGHT_N[i], n), DUSK_GLINT, dusk * 0.3)
+      );
+      const SEA_DARK = SEA_DARK_D.map((c, i) => mixRGB(c, SEA_DARK_N[i], n));
+      const FOAM = mixRGB(FOAM_D, FOAM_N, n);
+      const SPARKLE = mixRGB(SPARKLE_D, SPARKLE_N, n);
+      const HORIZON_LINE = mixRGB(mixRGB(HORIZON_D, HORIZON_N, n), DUSK_GLINT, dusk * 0.35);
+
       for (let y = 0; y < h; y++) {
         const rowOff = y * w * 4;
 
@@ -83,10 +123,26 @@ export default function WaveCanvas() {
             const useNext =
               frac > 0.5 && (x + y) % 2 === 0 && band < SKY.length - 1 ? 1 : 0;
             const c = SKY[Math.min(band + useNext, SKY.length - 1)];
+            let r = c[0];
+            let gr = c[1];
+            let b = c[2];
+
+            // starfield fades in with the night — static positions, slow twinkle
+            if (n > 0.02) {
+              const s = hash(x, y, 4099);
+              if (s < 3) {
+                const tw = 0.5 + 0.5 * (hash(x, y, 977 + (tq >> 2)) / 1023);
+                const u = n * tw * (s === 0 ? 1 : 0.7);
+                r += (STAR[0] - r) * u;
+                gr += (STAR[1] - gr) * u;
+                b += (STAR[2] - b) * u;
+              }
+            }
+
             const i = rowOff + x * 4;
-            data[i] = c[0];
-            data[i + 1] = c[1];
-            data[i + 2] = c[2];
+            data[i] = r;
+            data[i + 1] = gr;
+            data[i + 2] = b;
             data[i + 3] = 255;
           }
         } else if (y < horizonY + 2) {
@@ -142,8 +198,11 @@ export default function WaveCanvas() {
     resize();
     window.addEventListener("resize", resize);
 
+    let slowTick: ReturnType<typeof setInterval> | undefined;
     if (reduceMotion) {
+      // static frame, but still follow the day/night cycle at a slow tick
       draw(0);
+      slowTick = setInterval(() => draw(0), 10_000);
     } else {
       const start = performance.now();
       const loop = (now: number) => {
@@ -157,6 +216,7 @@ export default function WaveCanvas() {
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      if (slowTick) clearInterval(slowTick);
       window.removeEventListener("resize", resize);
     };
   }, []);

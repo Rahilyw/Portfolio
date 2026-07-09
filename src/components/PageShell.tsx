@@ -65,7 +65,7 @@ export default function PageShell({
 
         {/* headline */}
         <h1
-          className="font-bebas relative z-10 mt-2 text-7xl uppercase text-navy md:text-9xl"
+          className="font-dxburst relative z-10 mt-2 text-6xl uppercase text-navy md:text-8xl"
           style={{ textShadow: "3px 3px 0 var(--neon-yellow), 6px 6px 0 var(--navy-dark)" }}
         >
           <span aria-hidden="true" className="mr-2 text-[0.55em]">{emoji}</span>

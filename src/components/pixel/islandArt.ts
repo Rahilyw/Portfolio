@@ -11,9 +11,6 @@
 
 const SS = 4; // supersample factor
 
-/** Display scale: art pixels → CSS pixels (nearest-neighbor). */
-export const ART_SCALE = 2;
-
 export type SpriteVariant =
   | "volcano"
   | "lighthouse"
@@ -33,7 +30,23 @@ export const SPRITE_SIZES: Record<SpriteVariant, [number, number]> = {
   hut: [120, 90],
   bottle: [48, 64],
   whale: [68, 48],
-  ship: [114, 92],
+  ship: [152, 124],
+};
+
+/**
+ * Display scale: art pixels → CSS pixels (nearest-neighbor). The ship uses a
+ * denser art grid shown at a smaller multiple, so it keeps its on-screen size
+ * but gets a much finer pixel resolution.
+ */
+export const DISPLAY_SCALE: Record<SpriteVariant, number> = {
+  volcano: 2,
+  lighthouse: 2,
+  palm: 2,
+  mountain: 2,
+  hut: 2,
+  bottle: 2,
+  whale: 2,
+  ship: 1.5,
 };
 
 /**
@@ -49,20 +62,20 @@ const DRAW_SCALE: Record<SpriteVariant, number> = {
   hut: 1.25,
   bottle: 1,
   whale: 1,
-  ship: 1.35,
+  ship: 1.8,
 };
 
 const TAU = Math.PI * 2;
 
 /** Deterministic hash → [0,1). */
-function rnd(seed: number): number {
+export function rnd(seed: number): number {
   const s = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
   return s - Math.floor(s);
 }
 
-type Ctx = CanvasRenderingContext2D;
+export type Ctx = CanvasRenderingContext2D;
 
-function dot(g: Ctx, x: number, y: number, r: number, color: string, alpha = 1) {
+export function dot(g: Ctx, x: number, y: number, r: number, color: string, alpha = 1) {
   g.globalAlpha = alpha;
   g.fillStyle = color;
   g.beginPath();
@@ -71,7 +84,7 @@ function dot(g: Ctx, x: number, y: number, r: number, color: string, alpha = 1) 
   g.globalAlpha = 1;
 }
 
-function poly(g: Ctx, pts: number[][], color: string, alpha = 1) {
+export function poly(g: Ctx, pts: number[][], color: string, alpha = 1) {
   g.globalAlpha = alpha;
   g.fillStyle = color;
   g.beginPath();
@@ -82,7 +95,7 @@ function poly(g: Ctx, pts: number[][], color: string, alpha = 1) {
   g.globalAlpha = 1;
 }
 
-function stroke(g: Ctx, pts: number[][], w: number, color: string, alpha = 1) {
+export function stroke(g: Ctx, pts: number[][], w: number, color: string, alpha = 1) {
   g.globalAlpha = alpha;
   g.strokeStyle = color;
   g.lineWidth = w;
@@ -96,7 +109,7 @@ function stroke(g: Ctx, pts: number[][], w: number, color: string, alpha = 1) {
 }
 
 /** Scatter fine texture pixels inside an ellipse — dithered pixel shading. */
-function speckle(
+export function speckle(
   g: Ctx,
   cx: number,
   cy: number,
@@ -1157,6 +1170,74 @@ function drawShip(g: Ctx) {
   for (let i = 0; i < 3; i++) stroke(g, [[36 + i * 1.9, 7.6], [36 + i * 1.9, 11]], 0.35, "#3a2c22", 0.55); // staves
   dot(g, 38, 6.4, 0.9, "#e8ddc2", 0.9); // lookout's head peeking over the rim
 
+  // shrouds with ratline crosshatch, mast tops down to the rails
+  const shroud = (tx: number, ty: number, bxs: number[], by: number) => {
+    bxs.forEach((bx) => stroke(g, [[tx, ty], [bx, by]], 0.35, "#3a2c22", 0.5));
+    for (let i = 1; i <= 4; i++) {
+      const u = 0.3 + (i / 5) * 0.7; // rungs only on the lower stretch
+      stroke(
+        g,
+        [
+          [tx + (bxs[0] - tx) * u, ty + (by - ty) * u],
+          [tx + (bxs[bxs.length - 1] - tx) * u, ty + (by - ty) * u],
+        ],
+        0.25,
+        "#3a2c22",
+        0.4
+      );
+    }
+  };
+  shroud(38, 13, [28, 32.5], 44.8);
+  shroud(58.2, 18.5, [51, 54.5], 44.2);
+
+  // stern gallery: extra lit windows behind gilt trim rails
+  g.fillStyle = "#ffd23e";
+  g.fillRect(70.4, 37.2, 2.2, 2.6);
+  g.fillRect(73.6, 37.4, 1.9, 2.4);
+  dot(g, 72.5, 38.5, 3.2, "#ffd23e", 0.16);
+  stroke(g, [[63.4, 36.4], [76.2, 36.4]], 0.4, "#caa04a", 0.7);
+  stroke(g, [[63.4, 40.8], [76.2, 40.8]], 0.5, "#caa04a", 0.85);
+
+  // anchor catted at the bow
+  stroke(g, [[11.5, 44], [11.5, 48.8]], 0.7, "#2b2f36");
+  g.strokeStyle = "#2b2f36";
+  g.lineWidth = 0.7;
+  g.beginPath();
+  g.arc(11.5, 47.6, 2, 0.12 * Math.PI, 0.88 * Math.PI);
+  g.stroke();
+  stroke(g, [[10.3, 44.8], [12.7, 44.8]], 0.5, "#2b2f36");
+  dot(g, 11.5, 43.6, 0.55, "#caa04a");
+
+  // canvas patches + reef seams across the sails
+  g.fillStyle = "#d0bc8e";
+  g.fillRect(42.5, 16.2, 2.6, 2.6);
+  stroke(g, [[42.5, 16.2], [45.1, 18.8]], 0.3, "#a8946a", 0.9);
+  stroke(g, [[28, 17.2], [48.6, 17.2]], 0.35, "#cdb98a", 0.55);
+  stroke(g, [[27.8, 22.2], [48.9, 22.2]], 0.35, "#cdb98a", 0.55);
+  stroke(g, [[52, 23.6], [64.8, 23.6]], 0.3, "#cdb98a", 0.55);
+  g.fillStyle = "#d8c8a0";
+  g.fillRect(59.5, 25.5, 2.2, 2.2);
+  // billow shading down the mainsail leech
+  stroke(g, [[48.6, 14.6], [50.2, 20], [48.2, 25.6]], 1.1, "#c8b488", 0.45);
+
+  // deck clutter: rope coil + spare barrel
+  dot(g, 31, 45.3, 1.1, "#c9b78e", 0.95);
+  dot(g, 31, 45.3, 0.5, "#8a6432", 0.95);
+  dot(g, 22.5, 45.9, 1.5, "#8a5a2e");
+  stroke(g, [[21.2, 45.7], [23.8, 45.7]], 0.4, "#5c3a1e", 0.9);
+
+  // hull waterline shadow + churned foam at bow and stern
+  stroke(g, [[13, 55], [40, 59.4], [65, 56.2]], 0.8, "#33200e", 0.5);
+  dot(g, 8.5, 57.5, 1, "#f2f6f8", 0.85);
+  dot(g, 12, 59, 0.8, "#e9fbff", 0.8);
+  dot(g, 70, 55.5, 0.9, "#f2f6f8", 0.85);
+  dot(g, 74.5, 53.5, 0.7, "#e9fbff", 0.75);
+
+  // gull perched on the stern lantern
+  dot(g, 77.5, 32.6, 0.75, "#f5f9ff");
+  dot(g, 78.2, 31.9, 0.5, "#f5f9ff");
+  stroke(g, [[78.6, 32], [79.3, 32.1]], 0.35, "#f2b134", 0.95);
+
   // waterline shallows tint (foam is animated separately)
   g.globalAlpha = 0.4;
   g.fillStyle = "#7ce8ec";
@@ -1334,18 +1415,21 @@ const PAINTERS: Record<SpriteVariant, (g: Ctx) => void> = {
 };
 
 /**
- * Paints the sprite at supersample resolution and downscales to its
- * art-pixel grid. Client-side only.
+ * Generic pipeline: paints at supersample resolution and downscales to the
+ * art-pixel grid, baking in soft anti-aliased shading. Client-side only.
  */
-export function drawSpriteCanvas(variant: SpriteVariant): HTMLCanvasElement {
-  const [w, h] = SPRITE_SIZES[variant];
-
+export function rasterize(
+  painter: (g: Ctx) => void,
+  w: number,
+  h: number,
+  scale = 1
+): HTMLCanvasElement {
   const big = document.createElement("canvas");
   big.width = w * SS;
   big.height = h * SS;
   const bg = big.getContext("2d")!;
-  bg.scale(SS * DRAW_SCALE[variant], SS * DRAW_SCALE[variant]);
-  PAINTERS[variant](bg);
+  bg.scale(SS * scale, SS * scale);
+  painter(bg);
 
   const out = document.createElement("canvas");
   out.width = w;
@@ -1355,4 +1439,10 @@ export function drawSpriteCanvas(variant: SpriteVariant): HTMLCanvasElement {
   og.imageSmoothingQuality = "high";
   og.drawImage(big, 0, 0, w, h);
   return out;
+}
+
+/** Paints one of the island-scene sprites onto its art-pixel grid. */
+export function drawSpriteCanvas(variant: SpriteVariant): HTMLCanvasElement {
+  const [w, h] = SPRITE_SIZES[variant];
+  return rasterize(PAINTERS[variant], w, h, DRAW_SCALE[variant]);
 }

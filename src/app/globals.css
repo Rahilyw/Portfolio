@@ -84,6 +84,10 @@ body {
   font-family: var(--font-marker), cursive;
 }
 
+.font-dxburst {
+  font-family: var(--font-dxburst), var(--font-bebas), var(--font-retro), sans-serif;
+}
+
 .font-bebas {
   font-family: var(--font-bebas), var(--font-retro), sans-serif;
 }
@@ -134,8 +138,8 @@ body {
 }
 
 @keyframes cloud-drift {
-  from { transform: translateX(-15vw); }
-  to { transform: translateX(115vw); }
+  from { transform: translateX(calc(-100% - 4vw)); }
+  to { transform: translateX(calc(100vw + 4vw)); }
 }
 
 @keyframes sun-pulse {
@@ -144,20 +148,80 @@ body {
 }
 
 @keyframes fin-glide {
-  0% { transform: translateX(-10vw); opacity: 0; }
+  0% { transform: translateX(calc(-100% - 2vw)); opacity: 0; }
   6% { opacity: 1; }
   94% { opacity: 1; }
-  100% { transform: translateX(110vw); opacity: 0; }
+  100% { transform: translateX(calc(100vw + 2vw)); opacity: 0; }
+}
+
+@keyframes fin-glide-rev {
+  0% { transform: translateX(calc(100vw + 2vw)); opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { transform: translateX(calc(-100% - 2vw)); opacity: 0; }
 }
 
 @keyframes dolphin-arc {
-  0% { transform: translateX(-12vw) translateY(30px) rotate(12deg); opacity: 0; }
+  0% { transform: translateX(calc(-100% - 2vw)) translateY(30px) rotate(12deg); opacity: 0; }
   8% { opacity: 1; }
-  25% { transform: translateX(18vw) translateY(-34px) rotate(-6deg); }
+  25% { transform: translateX(22vw) translateY(-34px) rotate(-6deg); }
   50% { transform: translateX(48vw) translateY(26px) rotate(14deg); }
-  75% { transform: translateX(78vw) translateY(-30px) rotate(-8deg); }
+  75% { transform: translateX(74vw) translateY(-30px) rotate(-8deg); }
   92% { opacity: 1; }
-  100% { transform: translateX(112vw) translateY(24px) rotate(10deg); opacity: 0; }
+  100% { transform: translateX(calc(100vw + 2vw)) translateY(24px) rotate(10deg); opacity: 0; }
+}
+
+/* whale surfacing for a breather, then slipping back under */
+@keyframes whale-surface {
+  0% { opacity: 0; transform: translateY(16px); }
+  10% { opacity: 1; transform: translateY(0); }
+  88% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(16px); }
+}
+
+/* sailboat tacking across and back; flip swaps the bow at the far mark */
+@keyframes sail-x {
+  0% { transform: translateX(2vw); }
+  50% { transform: translateX(76vw); }
+  100% { transform: translateX(2vw); }
+}
+
+@keyframes sail-flip {
+  0%, 49.99% { transform: scaleX(1); }
+  50%, 100% { transform: scaleX(-1); }
+}
+
+/* banner plane flyby */
+@keyframes fly-across {
+  0% { transform: translateX(calc(-100% - 4vw)); opacity: 0; }
+  4% { opacity: 1; }
+  96% { opacity: 1; }
+  100% { transform: translateX(calc(100vw + 4vw)); opacity: 0; }
+}
+
+/* shooting star streaking down-left */
+@keyframes shoot {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate(-38vw, 24vh); opacity: 0; }
+}
+
+.shoot-head {
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  box-shadow: 0 0 6px 2px rgba(235, 240, 255, 0.9);
+}
+
+.shoot-trail {
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 84px;
+  height: 3px;
+  transform-origin: left center;
+  transform: rotate(-32deg) scaleX(-1);
+  background: linear-gradient(to right, rgba(235, 240, 255, 0.85), transparent);
 }
 
 @keyframes buoy-rock {
@@ -182,7 +246,13 @@ body {
   .animate-bottle,
   .cloud,
   .dolphin,
-  .sun {
+  .sun,
+  [style*="fin-glide"],
+  [style*="dolphin-arc"],
+  [style*="whale-surface"],
+  [style*="sail-"],
+  [style*="fly-across"],
+  [style*="shoot"] {
     animation: none !important;
   }
 }

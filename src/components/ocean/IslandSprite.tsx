@@ -6,7 +6,7 @@ import {
   drawSplashSheet,
   SPRITE_SIZES,
   SPLASH_FRAMES,
-  ART_SCALE,
+  DISPLAY_SCALE,
   type SpriteVariant,
 } from "@/components/pixel/islandArt";
 
@@ -39,8 +39,9 @@ export default function IslandSprite({ variant }: { variant: SpriteVariant }) {
   }, [variant]);
 
   const [w, h] = SPRITE_SIZES[variant];
-  const dw = w * ART_SCALE;
-  const dh = h * ART_SCALE;
+  const scale = DISPLAY_SCALE[variant];
+  const dw = w * scale;
+  const dh = h * scale;
   const sheetW = dw * SPLASH_FRAMES;
   const cycleS = (SPLASH_FRAMES * SPLASH_FRAME_MS) / 1000;
   // deterministic per-variant offset so shores don't splash in lockstep

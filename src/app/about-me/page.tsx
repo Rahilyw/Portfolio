@@ -79,7 +79,7 @@ export default function AboutMePage() {
               FEATURE INTERVIEW — 2026
             </p>
             <h1
-              className="font-bebas mt-2 text-[80px] leading-[0.88] text-navy-dark md:text-[108px]"
+              className="font-dxburst mt-2 text-[56px] leading-[1.02] text-navy-dark md:text-[76px]"
               style={{ textShadow: "3px 3px 0 #FFE000, 7px 7px 0 #0A2D4E" }}
             >
               YASITH RAHIL<br />WIJEYESEKERA

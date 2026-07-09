@@ -9,7 +9,14 @@ import {
   Bebas_Neue,
   Newsreader,
 } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const dxBurst = localFont({
+  src: "./fonts/DxBurst-Regular.otf",
+  variable: "--font-dxburst",
+  display: "swap",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,7 +88,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${titanOne.variable} ${pacifico.variable} ${marker.variable} ${bebasNeue.variable} ${newsreader.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${titanOne.variable} ${pacifico.variable} ${marker.variable} ${bebasNeue.variable} ${newsreader.variable} ${dxBurst.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
