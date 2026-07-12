@@ -5,14 +5,14 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 /**
  * Shared day/night clock for the ocean scene. Pure function of wall-clock
  * time, so the canvas ocean and the DOM sprites stay in sync without any
- * shared state: 5 minutes of day, 5 minutes of night, with ~30-second
+ * shared state: 45 seconds of day, 45 seconds of night, with short
  * sunrise/sunset ramps between them.
  *
  * Cycle t: 0 = sunrise, 0.25 = high noon, 0.5 = sunset, 0.75 = deep night.
  */
-export const CYCLE_MS = 10 * 60_000;
+export const CYCLE_MS = 90_000;
 
-/** Ramp half-width as a fraction of the cycle (~30s each side). */
+/** Ramp half-width as a fraction of the cycle (~4.5s each side). */
 const RAMP = 0.05;
 
 const smooth = (a: number, b: number, x: number) => {

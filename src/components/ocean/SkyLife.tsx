@@ -7,10 +7,9 @@ import { nightness, useDayNight, useReducedMotion } from "./dayNight";
 /**
  * Everything that lives in the sky above the horizon:
  * - detailed pixel clouds drifting (dimmed after dark)
- * - gulls gliding by day, a hot air balloon on a slow crossing
- * - an occasional banner plane flyby (daytime only)
- * - the sun and moon arcing with the 10-minute day/night cycle
- * - shooting stars streaking once the stars are out
+ * - a hot air balloon on a slow crossing
+ * - a regular banner plane flyby (daytime only)
+ * - the sun and moon arcing with the day/night cycle
  * Decorative only; the canvas starfield itself lives in WaveCanvas.
  */
 
@@ -20,22 +19,14 @@ const CLOUDS = [
   { kind: "cloud2" as const, top: "6%", duration: 160, delay: -50 },
 ];
 
-const GULLS = [
-  { top: "66%", left: "14%", flip: false, dur: "2.8s" },
-  { top: "58%", left: "78%", flip: true, dur: "3.3s" },
-  { top: "76%", left: "56%", flip: false, dur: "2.5s" },
-];
-
 type Flyby = { key: number; top: number };
-type Streak = { key: number; top: number; left: number };
 
 export default function SkyLife() {
   const { t, night } = useDayNight();
   const reduce = useReducedMotion();
   const [plane, setPlane] = useState<Flyby | null>(null);
-  const [star, setStar] = useState<Streak | null>(null);
 
-  // occasional daytime banner-plane flyby
+  // frequent daytime banner-plane flyby
   useEffect(() => {
     if (reduce) return;
     let alive = true;
@@ -57,38 +48,7 @@ export default function SkyLife() {
               schedule();
             }, 26_000)
           );
-        }, 45_000 + Math.random() * 80_000)
-      );
-    };
-    schedule();
-    return () => {
-      alive = false;
-      timeouts.forEach(clearTimeout);
-    };
-  }, [reduce]);
-
-  // shooting stars once it's properly dark
-  useEffect(() => {
-    if (reduce) return;
-    let alive = true;
-    const timeouts: Array<ReturnType<typeof setTimeout>> = [];
-    const schedule = () => {
-      timeouts.push(
-        setTimeout(() => {
-          if (!alive) return;
-          if (nightNow() < 0.6) {
-            schedule();
-            return;
-          }
-          setStar({ key: Date.now(), top: 4 + Math.random() * 34, left: 45 + Math.random() * 45 });
-          timeouts.push(
-            setTimeout(() => {
-              if (!alive) return;
-              setStar(null);
-              schedule();
-            }, 1800)
-          );
-        }, 9_000 + Math.random() * 22_000)
+        }, 8_000 + Math.random() * 18_000)
       );
     };
     schedule();
@@ -161,13 +121,13 @@ export default function SkyLife() {
         </div>
       ))}
 
-      {/* hot air balloon on a very slow crossing */}
+      {/* hot air balloon on a slow crossing */}
       <div
         className="cloud absolute left-0 top-[26%]"
         style={
           reduce
             ? { left: "70%" }
-            : { animation: "cloud-drift 340s linear infinite", animationDelay: "-90s" }
+            : { animation: "cloud-drift 110s linear infinite", animationDelay: "-30s" }
         }
       >
         <div className="animate-bob-slow" style={{ animationDuration: "6s" }}>
@@ -178,21 +138,6 @@ export default function SkyLife() {
         </div>
       </div>
 
-      {/* gulls, home before dark */}
-      {GULLS.map((b, i) => (
-        <div
-          key={i}
-          className="absolute animate-bob"
-          style={{ top: b.top, left: b.left, animationDuration: b.dur }}
-        >
-          <DecorSprite
-            kind="gull"
-            flip={b.flip}
-            style={{ opacity: day, transition: "opacity 2.5s linear" }}
-          />
-        </div>
-      ))}
-
       {/* banner plane flyby */}
       {plane && (
         <div
@@ -201,22 +146,6 @@ export default function SkyLife() {
           style={{ top: `${plane.top}%`, animation: "fly-across 26s linear forwards" }}
         >
           <DecorSprite kind="plane" />
-        </div>
-      )}
-
-      {/* shooting star */}
-      {star && (
-        <div
-          key={star.key}
-          className="absolute"
-          style={{
-            top: `${star.top}%`,
-            left: `${star.left}%`,
-            animation: "shoot 1.7s ease-out forwards",
-          }}
-        >
-          <div className="shoot-trail" />
-          <div className="shoot-head" />
         </div>
       )}
     </div>

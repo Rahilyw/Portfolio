@@ -11,13 +11,30 @@ import SoundToggle from "@/components/SoundToggle";
 const retroChip =
   "border-2 border-ink bg-white/95 px-3 py-1 font-pixel text-sm font-medium text-ink shadow-[3px_3px_0_rgba(8,51,68,0.45)] transition hover:bg-white";
 
+/**
+ * The sprite canvases carry different amounts of transparent headroom above
+ * the visible art, so each label tucks down (px) into its own sprite box to
+ * sit just above the artwork. The chip paints over the sprite, so on the
+ * volcano it sits in front of the (faded) smoke column instead of pushing
+ * above it.
+ */
+const LABEL_TUCK: Record<string, number> = {
+  volcano: 22,
+  lighthouse: 2,
+  palm: 30,
+  mountain: 26,
+  hut: 64,
+  bottle: 0,
+  ship: 5,
+};
+
 export default function OceanScene() {
   return (
     <main className="relative h-[100svh] overflow-hidden md:cursor-none">
       {/* pixel sky + ocean, rendered edge to edge (day/night cycle inside) */}
       <WaveCanvas />
 
-      {/* sky life: clouds, sun & moon, gulls, balloon, plane, shooting stars */}
+      {/* sky life: clouds, sun & moon, balloon, banner plane */}
       <SkyLife />
 
       {/* headline */}
@@ -50,11 +67,17 @@ export default function OceanScene() {
             >
               {/* islands sit still — the animated surf around them provides the motion */}
               <div className="flex flex-col items-center transition-transform duration-300 ease-out group-hover:scale-110 group-focus-visible:scale-110">
-                <span className={`mb-1.5 ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
-                  {island.label}
-                </span>
-                <span className="hidden text-xs font-medium text-white/90 opacity-0 transition [text-shadow:1px_1px_0_rgba(8,51,68,0.6)] group-hover:opacity-100 group-focus-visible:opacity-100 md:block">
-                  {island.blurb}
+                {/* blurb is absolutely positioned so the tuck below stays exact */}
+                <span
+                  className="relative z-10"
+                  style={{ marginBottom: -(LABEL_TUCK[island.variant] ?? 0) }}
+                >
+                  <span className={`inline-block ${retroChip} group-focus-visible:ring-2 group-focus-visible:ring-white md:text-base`}>
+                    {island.label}
+                  </span>
+                  <span className="absolute left-1/2 top-full hidden -translate-x-1/2 whitespace-nowrap pt-1 text-xs font-medium text-white/90 opacity-0 transition [text-shadow:1px_1px_0_rgba(8,51,68,0.6)] group-hover:opacity-100 group-focus-visible:opacity-100 md:block">
+                    {island.blurb}
+                  </span>
                 </span>
                 <IslandSprite variant={island.variant} />
               </div>

@@ -450,23 +450,24 @@ function drawVolcano(g: Ctx) {
   dot(g, 38, 25, 0.45, "#ff9a3e", 0.85);
   dot(g, 57, 23, 0.45, "#ffd23e", 0.8);
 
-  // --- billowing smoke column ---
-  const puffs: Array<[number, number, number]> = [
-    [48.5, 21, 3.4],
-    [45.5, 16.5, 4.2],
-    [50, 12.5, 4.8],
-    [44.5, 8.5, 5.2],
-    [49.5, 4.5, 5.6],
-    [43.5, 1.5, 4.6],
-    [54.5, 2, 3.4],
+  // --- billowing smoke column, thinning and fading as it rises so it
+  // dissipates inside the canvas instead of clipping at the top edge ---
+  const puffs: Array<[number, number, number, number]> = [
+    [48.5, 21, 3.4, 1],
+    [45.5, 17, 4.2, 0.9],
+    [49.5, 13, 4.6, 0.72],
+    [45, 9.5, 4.4, 0.52],
+    [49, 6.5, 3.8, 0.34],
+    [45.5, 4.5, 3, 0.2],
+    [50.5, 3.4, 2.4, 0.12],
   ];
-  puffs.forEach(([px, py, pr]) => {
-    dot(g, px + pr * 0.3, py + pr * 0.2, pr, "#767e88", 0.9); // shaded side
-    dot(g, px, py, pr * 0.92, "#949ca6", 0.95);
-    dot(g, px - pr * 0.32, py - pr * 0.3, pr * 0.55, "#bcc4cc", 0.95); // lit top
+  puffs.forEach(([px, py, pr, fade]) => {
+    dot(g, px + pr * 0.3, py + pr * 0.2, pr, "#767e88", 0.9 * fade); // shaded side
+    dot(g, px, py, pr * 0.92, "#949ca6", 0.95 * fade);
+    dot(g, px - pr * 0.32, py - pr * 0.3, pr * 0.55, "#bcc4cc", 0.95 * fade); // lit top
   });
-  dot(g, 59, 6, 2.2, "#949ca6", 0.8); // stray detached puff
-  dot(g, 58.4, 5.4, 1.2, "#bcc4cc", 0.85);
+  dot(g, 57, 6.5, 1.8, "#949ca6", 0.25); // stray detached puff, drifting apart
+  dot(g, 56.5, 5.9, 1, "#bcc4cc", 0.28);
 
   // --- rocks scattered in the surf ---
   poly(g, [[8, wy + 2], [12, 57.5], [17, wy + 2]], "#5c5045");
