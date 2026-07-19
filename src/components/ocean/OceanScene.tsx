@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { islands, site } from "@/data/content";
+import { SPRITE_SIZES, DISPLAY_SCALE } from "@/components/pixel/islandArt";
 import WaveCanvas from "./WaveCanvas";
 import Surfer from "./Surfer";
 import IslandSprite from "./IslandSprite";
@@ -26,6 +27,22 @@ const LABEL_TUCK: Record<string, number> = {
   hut: 64,
   bottle: 0,
   ship: 5,
+};
+
+/**
+ * The desktop map's hand-placed coordinates don't fit a phone — at 375px every
+ * island's hit area overlaps a neighbour. Below `md` the islands render as a
+ * 2-column grid instead, with sprites shrunk to fit a grid cell. The bottle is
+ * much smaller art than the islands, so it shrinks less.
+ */
+const MOBILE_SPRITE_SCALE: Record<string, number> = {
+  volcano: 0.5,
+  lighthouse: 0.5,
+  palm: 0.5,
+  mountain: 0.5,
+  hut: 0.5,
+  bottle: 0.75,
+  ship: 0.5,
 };
 
 export default function OceanScene() {
@@ -58,11 +75,12 @@ export default function OceanScene() {
         <NightDim className="absolute inset-0">
           <OceanLife />
 
+          {/* desktop: islands scattered across the map at hand-placed coordinates */}
           {islands.map((island) => (
             <Link
               key={island.slug}
               href={`/${island.slug}`}
-              className="group absolute z-20 -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none"
+              className="group absolute z-20 hidden -translate-x-1/2 -translate-y-1/2 focus-visible:outline-none md:block"
               style={{ left: `${island.x}%`, top: `${island.y}%` }}
             >
               {/* islands sit still — the animated surf around them provides the motion */}
@@ -83,6 +101,33 @@ export default function OceanScene() {
               </div>
             </Link>
           ))}
+
+          {/* mobile: same islands as a 2-column grid so tap targets never overlap */}
+          {/* pb clears the sound toggle pinned to the viewport's bottom-left */}
+          <div className="absolute inset-0 z-20 grid grid-cols-2 content-evenly justify-items-center px-2 pb-16 md:hidden">
+            {islands.map((island) => {
+              const scale = MOBILE_SPRITE_SCALE[island.variant] ?? 0.5;
+              const [w, h] = SPRITE_SIZES[island.variant];
+              const dw = w * DISPLAY_SCALE[island.variant] * scale;
+              const dh = h * DISPLAY_SCALE[island.variant] * scale;
+              return (
+                <Link
+                  key={island.slug}
+                  href={`/${island.slug}`}
+                  className="group flex flex-col items-center focus-visible:outline-none"
+                >
+                  <div style={{ width: dw, height: dh }}>
+                    <div style={{ transform: `scale(${scale})`, transformOrigin: "top left" }}>
+                      <IslandSprite variant={island.variant} />
+                    </div>
+                  </div>
+                  <span className={`${retroChip} -mt-1 group-focus-visible:ring-2 group-focus-visible:ring-white`}>
+                    {island.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </NightDim>
       </div>
 

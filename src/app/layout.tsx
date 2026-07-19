@@ -10,6 +10,7 @@ import {
   Newsreader,
 } from "next/font/google";
 import localFont from "next/font/local";
+import { site, siteUrl } from "@/data/content";
 import "./globals.css";
 
 const dxBurst = localFont({
@@ -65,10 +66,13 @@ const newsreader = Newsreader({
   style: ["normal", "italic"],
 });
 
+const description =
+  "Portfolio of Rahil Wijeyesekera — Computer Science student at the University of Victoria building AI agents, systems tools, and web apps. Surf the islands to explore.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Rahil Wijeyesekera — Portfolio",
-  description:
-    "Portfolio of Rahil Wijeyesekera — Computer Science student at the University of Victoria building AI agents, systems tools, and web apps. Surf the islands to explore.",
+  description,
   keywords: [
     "Rahil Wijeyesekera",
     "portfolio",
@@ -78,6 +82,34 @@ export const metadata: Metadata = {
     "RAG",
     "MCP",
   ],
+  openGraph: {
+    title: "Rahil Wijeyesekera — Portfolio",
+    description,
+    url: "/",
+    siteName: "Rahil Wijeyesekera",
+    locale: "en_CA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rahil Wijeyesekera — Portfolio",
+    description,
+  },
+};
+
+/** Schema.org Person — helps search engines connect the site to the name. */
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: site.name,
+  url: siteUrl,
+  email: `mailto:${site.email}`,
+  jobTitle: "Computer Science Student",
+  affiliation: {
+    "@type": "CollegeOrUniversity",
+    name: "University of Victoria",
+  },
+  sameAs: [site.github, site.linkedin],
 };
 
 export default function RootLayout({
@@ -90,7 +122,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${titanOne.variable} ${pacifico.variable} ${marker.variable} ${bebasNeue.variable} ${newsreader.variable} ${dxBurst.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

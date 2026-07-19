@@ -4,8 +4,19 @@ export const site = {
   github: "https://github.com/Rahilyw",
   linkedin: "https://linkedin.com/in/rahil-wijeyesekera",
   email: "rahilwijeyesekera@uvic.ca",
-  resume: "/resume.pdf", // drop your PDF at public/resume.pdf
+  resume: "/resume.pdf",
 };
+
+/**
+ * Canonical site URL for metadata, sitemap, and robots. On Vercel the
+ * production domain is injected automatically; NEXT_PUBLIC_SITE_URL wins
+ * once a custom domain exists.
+ */
+export const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
 
 export type Island = {
   slug: string;

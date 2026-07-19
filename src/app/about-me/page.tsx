@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/data/content";
 import BottleReveal from "@/components/BottleReveal";
@@ -29,8 +30,9 @@ function Polaroid({
       className="shrink-0 bg-white p-2 pb-8 shadow-[4px_6px_18px_rgba(0,0,0,0.22)]"
       style={{ transform: rotate }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} className={`${width} ${height} object-cover`} />
+      <div className={`relative ${width} ${height}`}>
+        <Image src={src} alt={alt} fill sizes="200px" className="object-cover" />
+      </div>
       <p className="mt-1 text-center font-sans text-xs text-gray-400">{caption}</p>
     </div>
   );
@@ -101,12 +103,16 @@ export default function AboutMePage() {
               className="bg-white p-3 pb-12 shadow-[4px_6px_24px_rgba(0,0,0,0.20)]"
               style={{ transform: "rotate(2.5deg)" }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/rahil-portrait.jpeg"
-                alt="Rahil Wijeyesekera"
-                className="h-80 w-52 object-cover object-top"
-              />
+              <div className="relative h-80 w-52">
+                <Image
+                  src="/images/rahil-portrait.jpeg"
+                  alt="Rahil Wijeyesekera"
+                  fill
+                  sizes="208px"
+                  priority
+                  className="object-cover object-top"
+                />
+              </div>
               <p className="mt-2 text-center font-sans text-xs text-gray-400">Sri Lanka, 2024</p>
             </div>
           </div>
@@ -189,12 +195,15 @@ export default function AboutMePage() {
                 className="mt-7 bg-white p-2 pb-7 shadow-md"
                 style={{ transform: "rotate(-1.5deg)" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/rahil-surf-beach.jpeg"
-                  alt="Surf session"
-                  className="h-32 w-full object-cover object-center"
-                />
+                <div className="relative h-32 w-full">
+                  <Image
+                    src="/images/rahil-surf-beach.jpeg"
+                    alt="Surf session"
+                    fill
+                    sizes="300px"
+                    className="object-cover object-center"
+                  />
+                </div>
                 <p className="mt-1 text-center font-sans text-xs text-gray-400">Surf Sessions</p>
               </div>
             </div>
