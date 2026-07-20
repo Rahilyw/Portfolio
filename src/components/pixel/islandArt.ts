@@ -956,11 +956,11 @@ function drawBottle(g: Ctx) {
 
   g.restore();
 
-  // waterline tint (foam is animated separately)
-  g.globalAlpha = 0.45;
-  g.fillStyle = "#7ce8ec";
+  // displaced-water shading under the glass (surf is animated separately)
+  g.globalAlpha = 0.24;
+  g.fillStyle = "#0b3550";
   g.beginPath();
-  g.ellipse(24, 57, 15, 3.4, 0, 0, TAU);
+  g.ellipse(24, 57, 13, 2.4, 0, 0, TAU);
   g.fill();
   g.globalAlpha = 1;
   // rising bubbles
@@ -1054,11 +1054,11 @@ function drawWhale(g: Ctx) {
   stroke(g, [[25.4, 7.5], [25, 5.8]], 0.7, "#bfe6ff", 0.8);
   stroke(g, [[26.8, 7.5], [27.6, 5.4]], 0.7, "#bfe6ff", 0.8);
 
-  // waterline tint (foam is animated separately)
-  g.globalAlpha = 0.4;
-  g.fillStyle = "#7ce8ec";
+  // displaced-water shading under the body (surf is animated separately)
+  g.globalAlpha = 0.24;
+  g.fillStyle = "#0b3550";
   g.beginPath();
-  g.ellipse(33, 40.5, 28, 4.5, 0, 0, TAU);
+  g.ellipse(33, 40.5, 25, 3.2, 0, 0, TAU);
   g.fill();
   g.globalAlpha = 1;
 }
@@ -1239,11 +1239,17 @@ function drawShip(g: Ctx) {
   dot(g, 78.2, 31.9, 0.5, "#f5f9ff");
   stroke(g, [[78.6, 32], [79.3, 32.1]], 0.35, "#f2b134", 0.95);
 
-  // waterline shallows tint (foam is animated separately)
-  g.globalAlpha = 0.4;
-  g.fillStyle = "#7ce8ec";
+  // displaced-water shading tight under the hull — the ship sits IN the sea
+  // (draft shadow) instead of on a bright shallow pad; surf is animated
+  // separately (drawSplashSheet)
+  g.globalAlpha = 0.28;
+  g.fillStyle = "#0b3550";
   g.beginPath();
-  g.ellipse(41, 60, 37, 4.6, 0, 0, TAU);
+  g.ellipse(41, 59.5, 33, 2.8, 0, 0, TAU);
+  g.fill();
+  g.globalAlpha = 0.13;
+  g.beginPath();
+  g.ellipse(41, 60, 36.5, 4.2, 0, 0, TAU);
   g.fill();
   g.globalAlpha = 1;
 }
@@ -1266,17 +1272,33 @@ const SPLASH_GEOM: Record<SpriteVariant, [number, number, number, number]> = {
 };
 
 /**
- * Paints a looping sheet of surf breaking against the shore. Drawn with raw
- * 1px rects at art resolution — no supersampling — so the water has the same
+ * Floating sprites ride the water instead of rising from the seabed, so
+ * their surf behaves differently from island shores (see drawSplashSheet).
+ */
+const FLOATERS = new Set<SpriteVariant>(["ship", "bottle", "whale"]);
+
+/**
+ * Paints a looping sheet of surf around each sprite. Drawn with raw 1px
+ * rects at art resolution — no supersampling — so the water has the same
  * hard, chunky pixels as the background ocean.
  *
- * Three layers, all phase-driven so the 12-frame loop is seamless:
+ * All layers are phase-driven so the 12-frame loop is seamless, and the mix
+ * depends on what the sprite is:
+ *
+ * Islands (land rising out of the sea):
  * 1. wavelets — three arcs per loop roll IN toward the shore, turning from
  *    aqua to white as they steepen, then burst on contact
- * 2. foam collar — a continuous churning band hugging the waterline, fed by
- *    each wavelet's burst
- * 3. spray + backwash — droplets kicked up with gravity where wavelets land,
- *    and streaks sliding back out as the water drains
+ * 2. foam collar — a continuous churning band hugging the waterline
+ * 3. spray + backwash — droplets kicked up where wavelets land, and streaks
+ *    sliding back out as the water drains
+ *
+ * Floaters (ship, bottle, whale — objects riding the swell):
+ * 1. bob ripples — rings pushed OUTWARD by the hull, dissolving as they
+ *    spread (the reverse of the islands' incoming wavelets)
+ * 2. the same foam collar, as water sloshing against the hull
+ * 3. lighter spray — an occasional slap of chop, not a breaking wave
+ *
+ * Everyone gets a few blinking glints on the surrounding water.
  * Only the front-facing arc is painted (the sprite hides the back shore).
  */
 export function drawSplashSheet(variant: SpriteVariant): HTMLCanvasElement {
@@ -1309,29 +1331,51 @@ export function drawSplashSheet(variant: SpriteVariant): HTMLCanvasElement {
     };
 
     const N = Math.round(rx * 2.6); // fine angular sampling → connected runs
+    const floater = FLOATERS.has(variant);
 
-    // --- 1. incoming wavelets: three staggered arcs rolling toward shore ---
-    for (let wv = 0; wv < 3; wv++) {
-      const u = (t + wv / 3) % 1; // 0 far out → 1 hits the shore
-      const dist = (1 - u) * 6.5 + 1.2; // approach distance
-      const aOff = rnd(wv * 17.3) * TAU;
-      for (let i = 0; i < N; i++) {
-        const a = (i / N) * TAU;
-        if (Math.sin(a) < -0.2) continue;
-        // wavelets are broken arcs, not full rings
-        const seg = Math.sin(a * 2.2 + aOff + u * 1.5);
-        if (seg < -0.15) continue;
-        const jig = (rnd(i * 3.9 + wv * 31) - 0.5) * 0.9;
-        const x = cx + Math.cos(a) * (rx + dist + jig);
-        const y = cy + Math.sin(a) * (ry + dist * 0.45 + jig * 0.4);
-        // steepening: aqua far out, pale mid, white sheet just before impact
-        if (u > 0.78) {
-          px(x, y, FOAM);
-          if (seg > 0.5) px(x + Math.sign(Math.cos(a)), y, SOFT);
-        } else if (u > 0.5) {
-          px(x, y, PALE);
-        } else if (rnd(i * 5.1 + wv) > 0.35) {
-          px(x, y, AQUA);
+    if (floater) {
+      // --- 1f. bob ripples: rings pushed outward, dissolving as they go ---
+      for (let rp = 0; rp < 3; rp++) {
+        const u = (t + rp / 3) % 1; // 0 at the hull → 1 far out
+        const spread = u * 7 + 0.8;
+        const aOff = rnd(rp * 21.7) * TAU;
+        for (let i = 0; i < N; i++) {
+          const a = (i / N) * TAU;
+          if (Math.sin(a) < -0.2) continue;
+          // broken dashes so rings read as pixel ripples, not drawn ovals
+          if (Math.sin(a * 3.1 + aOff + u * 2.2) < 0.05) continue;
+          // rings thin out and break apart as they dissolve
+          if (rnd(i * 6.3 + rp * 13) < u * 0.65) continue;
+          const jig = (rnd(i * 4.7 + rp * 19) - 0.5) * 0.9;
+          const x = cx + Math.cos(a) * (rx + spread + jig);
+          const y = cy + Math.sin(a) * (ry + spread * 0.42 + jig * 0.4);
+          px(x, y, u < 0.3 ? SOFT : u < 0.62 ? PALE : AQUA);
+        }
+      }
+    } else {
+      // --- 1. incoming wavelets: three staggered arcs rolling toward shore ---
+      for (let wv = 0; wv < 3; wv++) {
+        const u = (t + wv / 3) % 1; // 0 far out → 1 hits the shore
+        const dist = (1 - u) * 6.5 + 1.2; // approach distance
+        const aOff = rnd(wv * 17.3) * TAU;
+        for (let i = 0; i < N; i++) {
+          const a = (i / N) * TAU;
+          if (Math.sin(a) < -0.2) continue;
+          // wavelets are broken arcs, not full rings
+          const seg = Math.sin(a * 2.2 + aOff + u * 1.5);
+          if (seg < -0.15) continue;
+          const jig = (rnd(i * 3.9 + wv * 31) - 0.5) * 0.9;
+          const x = cx + Math.cos(a) * (rx + dist + jig);
+          const y = cy + Math.sin(a) * (ry + dist * 0.45 + jig * 0.4);
+          // steepening: aqua far out, pale mid, white sheet just before impact
+          if (u > 0.78) {
+            px(x, y, FOAM);
+            if (seg > 0.5) px(x + Math.sign(Math.cos(a)), y, SOFT);
+          } else if (u > 0.5) {
+            px(x, y, PALE);
+          } else if (rnd(i * 5.1 + wv) > 0.35) {
+            px(x, y, AQUA);
+          }
         }
       }
     }
@@ -1359,14 +1403,16 @@ export function drawSplashSheet(variant: SpriteVariant): HTMLCanvasElement {
       }
     }
 
-    // --- 3a. spray bursts with gravity where the wavelets strike ---
-    for (let j = 0; j < 9; j++) {
+    // --- 3a. spray bursts with gravity where the water strikes ---
+    // floaters take an occasional slap of chop; shores take breaking waves
+    const sprayCount = floater ? 5 : 9;
+    for (let j = 0; j < sprayCount; j++) {
       const a = (0.06 + rnd(j * 13.7) * 0.88) * Math.PI; // front arc
       const bx = cx + Math.cos(a) * (rx + 0.5);
       const by = cy + Math.sin(a) * (ry + 0.3);
       const life = (t + rnd(j * 5.1)) % 1;
       if (life > 0.9) continue;
-      const power = 0.6 + rnd(j * 8.3) * 0.8;
+      const power = (floater ? 0.45 : 0.6) + rnd(j * 8.3) * (floater ? 0.55 : 0.8);
       const drift = Math.cos(a) * 2.2 * life; // spray thrown outward
       const rise = 6 * power * life - 7 * power * life * life; // parabola
       // main droplet + trailing droplets behind it on the same arc
@@ -1387,16 +1433,30 @@ export function drawSplashSheet(variant: SpriteVariant): HTMLCanvasElement {
     }
 
     // --- 3b. backwash: streaks draining outward and dissolving ---
-    for (let i = 0; i < N; i += 2) {
-      const a = (i / N) * TAU + 0.35;
+    // shore-only: floaters' outbound water is already the ripple rings
+    if (!floater) {
+      for (let i = 0; i < N; i += 2) {
+        const a = (i / N) * TAU + 0.35;
+        if (Math.sin(a) < -0.1) continue;
+        const u = (t + rnd(i * 9.7)) % 1;
+        if (u > 0.85 || rnd(i * 2.9) < 0.4) continue;
+        const x = cx + Math.cos(a) * (rx + 1.2 + u * 4.5);
+        const y = cy + Math.sin(a) * (ry + 0.7 + u * 2);
+        px(x, y, u < 0.3 ? SOFT : u < 0.6 ? PALE : AQUA);
+        // short trail pointing back toward the shore
+        if (u < 0.5) px(x - Math.sign(Math.cos(a)), y - (Math.sin(a) > 0 ? 1 : 0), PALE);
+      }
+    }
+
+    // --- 4. glints: stray pixels of light blinking on the nearby water ---
+    for (let s = 0; s < 5; s++) {
+      const a = rnd(s * 23.1 + 3) * TAU;
       if (Math.sin(a) < -0.1) continue;
-      const u = (t + rnd(i * 9.7)) % 1;
-      if (u > 0.85 || rnd(i * 2.9) < 0.4) continue;
-      const x = cx + Math.cos(a) * (rx + 1.2 + u * 4.5);
-      const y = cy + Math.sin(a) * (ry + 0.7 + u * 2);
-      px(x, y, u < 0.3 ? SOFT : u < 0.6 ? PALE : AQUA);
-      // short trail pointing back toward the shore
-      if (u < 0.5) px(x - Math.sign(Math.cos(a)), y - (Math.sin(a) > 0 ? 1 : 0), PALE);
+      const life = (t * 2 + rnd(s * 11.7)) % 1; // two blinks per loop
+      if (life > 0.3) continue;
+      const x = cx + Math.cos(a) * (rx + 3.5 + rnd(s * 7.9) * 5.5);
+      const y = cy + Math.sin(a) * (ry + 2 + rnd(s * 5.3) * 3);
+      px(x, y, life < 0.15 ? FOAM : SOFT);
     }
   }
   return sheet;

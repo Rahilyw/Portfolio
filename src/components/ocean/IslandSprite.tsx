@@ -14,6 +14,18 @@ import {
 const SPLASH_FRAME_MS = 150;
 
 /**
+ * Floating sprites ride the swell: the ARTWORK layer rocks or bobs while the
+ * splash layer stays pinned to the waterline, so the foam reads as water the
+ * sprite moves through rather than a decal glued to it. Islands are land —
+ * they hold still and let the surf provide the motion.
+ */
+const FLOAT_MOTION: Partial<Record<SpriteVariant, string>> = {
+  ship: "animate-ship-rock",
+  bottle: "animate-bottle",
+  whale: "animate-bob-slow",
+};
+
+/**
  * Detailed pixel-art scenery sprites — islands, the pirate ship, the message
  * bottle, and the whale. Painted procedurally on the client (see islandArt.ts)
  * and upscaled nearest-neighbor for the chunky look.
@@ -48,11 +60,7 @@ export default function IslandSprite({ variant }: { variant: SpriteVariant }) {
   const desync = -((variant.length * 0.37) % cycleS);
 
   return (
-    <div
-      className={variant === "bottle" ? "animate-bottle" : undefined}
-      style={{ position: "relative", width: dw, height: dh }}
-      aria-hidden="true"
-    >
+    <div style={{ position: "relative", width: dw, height: dh }} aria-hidden="true">
       <style>{`
         @keyframes splash-${variant} {
           from { background-position: 0 0; }
@@ -61,7 +69,9 @@ export default function IslandSprite({ variant }: { variant: SpriteVariant }) {
       `}</style>
       {art && (
         <>
+          {/* artwork layer: floaters rock/bob on the swell, islands sit still */}
           <div
+            className={FLOAT_MOTION[variant]}
             style={{
               position: "absolute",
               inset: 0,
@@ -70,7 +80,8 @@ export default function IslandSprite({ variant }: { variant: SpriteVariant }) {
               imageRendering: "pixelated",
             }}
           />
-          {/* surf layer: steps() hard-cuts one splash frame per tick */}
+          {/* surf layer: steps() hard-cuts one splash frame per tick; stays
+              pinned to the waterline while the artwork above it moves */}
           <div
             style={{
               position: "absolute",

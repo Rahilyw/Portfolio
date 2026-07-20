@@ -218,16 +218,30 @@ body {
   50% { transform: rotate(4deg) translateY(-12px); }
 }
 
+/* heavy hull rolling on the swell — pivots at the waterline, with a slight
+   lag between the roll and the lift so it reads as mass, not a metronome */
+@keyframes ship-rock {
+  0%, 100% { transform: rotate(-1.4deg) translateY(0.5px); }
+  30% { transform: rotate(0.4deg) translateY(-2.5px); }
+  55% { transform: rotate(1.3deg) translateY(-1px); }
+  80% { transform: rotate(-0.4deg) translateY(-2px); }
+}
+
 .animate-bob { animation: bob 3.4s ease-in-out infinite; }
 .animate-bob-slow { animation: bob-slow 4.6s ease-in-out infinite; }
 .animate-buoy { animation: buoy-rock 3.8s ease-in-out infinite; }
 .animate-bottle { animation: bottle-float 4.2s ease-in-out infinite; }
+.animate-ship-rock {
+  animation: ship-rock 7.5s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .animate-bob,
   .animate-bob-slow,
   .animate-buoy,
   .animate-bottle,
+  .animate-ship-rock,
   .cloud,
   .sun,
   [style*="sail-"],
