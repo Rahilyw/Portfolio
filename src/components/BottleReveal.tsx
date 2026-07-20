@@ -47,11 +47,11 @@ export default function BottleReveal() {
             <div className="animate-bottle">
               <BottleSVG />
             </div>
-            <p className="font-marker mt-4 text-sm text-navy/55 transition group-hover:text-navy">
+            <p className="font-pixel mt-4 text-sm text-navy/55 transition group-hover:text-navy">
               a mysterious message washed ashore...
             </p>
-            <p className="font-bebas mt-1 text-xl tracking-[3px] text-coral-hot group-hover:underline">
-              OPEN THE BOTTLE ↓
+            <p className="font-press mt-2 text-[10px] uppercase tracking-wide text-coral group-hover:underline">
+              Open the bottle
             </p>
           </motion.button>
         ) : (
@@ -64,7 +64,7 @@ export default function BottleReveal() {
           >
             {/* parchment letter */}
             <div
-              className="relative border-4 border-navy-dark p-8 shadow-[8px_8px_0_#0A2D4E]"
+              className="relative border-4 border-ink p-8 shadow-[8px_8px_0_var(--ink)]"
               style={{ background: "linear-gradient(175deg, #fefce8, #fef3c7 55%, #fde68a)" }}
             >
               {/* torn-paper top edge */}
@@ -79,13 +79,13 @@ export default function BottleReveal() {
               />
 
               <h2
-                className="font-bebas text-5xl text-navy-dark"
-                style={{ textShadow: "2px 2px 0 #FFE000" }}
+                className="font-pixel text-3xl uppercase text-navy sm:text-4xl"
+                style={{ textShadow: "2px 2px 0 var(--mustard)" }}
               >
-                AHOY! 🏄‍♂️
+                Ahoy!
               </h2>
-              <p className="font-editorial mt-3 text-sm italic leading-relaxed text-navy/80">
-                Whether it&apos;s an internship, a collab, or just to talk AI agents and surfing —
+              <p className="mt-3 text-sm leading-relaxed text-navy/80">
+                Whether it&apos;s an internship, a collab, or just to talk AI agents and surfing -
                 I&apos;d love to hear from you. The wave&apos;s up. Let&apos;s go.
               </p>
 
@@ -108,30 +108,28 @@ export default function BottleReveal() {
                       }
                       rel="noopener noreferrer"
                       download={l.download || undefined}
-                      className="flex items-center gap-3 border-2 border-navy/20 bg-white/60 px-4 py-3 transition hover:border-navy hover:bg-white hover:shadow-[2px_2px_0_#1d3557]"
+                      className="pixel-btn flex w-full items-center gap-3 bg-foam px-4 py-3 text-left text-navy hover:bg-sand"
                     >
                       <span className="text-xl" aria-hidden="true">{l.icon}</span>
-                      <span className="font-bebas text-lg tracking-wide text-navy-dark">
+                      <span className="font-press text-[10px] uppercase tracking-wide text-navy">
                         {l.label}
                       </span>
-                      <span className="ml-auto font-editorial text-sm italic text-navy/60">
-                        {l.value}
-                      </span>
+                      <span className="ml-auto text-sm text-navy/60">{l.value}</span>
                     </a>
                   </motion.li>
                 ))}
               </ul>
 
-              <p className="mt-6 text-right font-script text-xl text-navy/60">— Rahil</p>
+              <p className="mt-6 text-right font-press text-[9px] text-navy/60">- Rahil</p>
             </div>
 
             <div className="mt-5 text-center">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="cursor-pointer font-bebas text-sm tracking-widest text-navy/40 transition hover:text-navy"
+                className="cursor-pointer font-press text-[9px] uppercase tracking-widest text-navy/40 transition hover:text-navy"
               >
-                PUT THE MESSAGE BACK ↑
+                Put the message back
               </button>
             </div>
           </motion.div>

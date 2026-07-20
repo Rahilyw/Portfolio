@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
+import { PixelLink } from "@/components/game/PixelButton";
+import { Seashell, Surfboard } from "@/components/game/SurfMotifs";
 import { featuredProjects, otherProjects, type Project } from "@/data/content";
 
 export const metadata: Metadata = {
@@ -9,14 +11,12 @@ export const metadata: Metadata = {
 };
 
 const chipColors = [
-  "bg-tealsurf text-white",
-  "bg-sunset text-white",
+  "bg-tealsurf text-foam",
+  "bg-sunset text-foam",
   "bg-mustard text-navy",
-  "bg-coral text-white",
+  "bg-coral text-foam",
   "bg-navy text-cream",
 ];
-
-const tilts = ["rotate-[0.5deg]", "-rotate-[0.4deg]", "-rotate-[0.6deg]", "rotate-[0.3deg]"];
 
 function StackChips({ stack, offset = 0 }: { stack: string[]; offset?: number }) {
   return (
@@ -24,7 +24,7 @@ function StackChips({ stack, offset = 0 }: { stack: string[]; offset?: number })
       {stack.map((s, i) => (
         <li
           key={s}
-          className={`rounded-full border-2 border-navy px-2.5 py-0.5 text-xs font-semibold ${chipColors[(i + offset) % chipColors.length]}`}
+          className={`border-2 border-ink px-2 py-0.5 font-press text-[7px] uppercase sm:text-[8px] ${chipColors[(i + offset) % chipColors.length]}`}
         >
           {s}
         </li>
@@ -33,34 +33,66 @@ function StackChips({ stack, offset = 0 }: { stack: string[]; offset?: number })
   );
 }
 
-function FeaturedCard({ project, index }: { project: Project; index: number }) {
+function QuestCard({
+  project,
+  index,
+  kind,
+}: {
+  project: Project;
+  index: number;
+  kind: "main" | "side";
+}) {
+  const isMain = kind === "main";
   return (
     <article
-      className={`overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.1)] transition hover:-translate-y-1 ${tilts[index % tilts.length]}`}
+      className={`pixel-panel flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[8px_8px_0_var(--ink)] ${
+        isMain && index % 2 ? "float-panel" : ""
+      }`}
+      style={isMain && index % 2 ? { animationDelay: `${index * 0.35}s` } : undefined}
     >
-      <div className="bg-navy-dark px-5 py-3">
-        <span className="font-bebas text-xs tracking-[3px] text-neon-yellow">FEATURED BUILD</span>
+      <div
+        className={`flex items-center justify-between gap-2 px-4 py-2 ${
+          isMain ? "bg-sunset" : "bg-tealsurf"
+        }`}
+      >
+        <span className="inline-flex items-center gap-1.5 font-press text-[8px] uppercase text-foam">
+          {isMain ? <Surfboard size={12} /> : <Seashell size={12} />}
+          {isMain ? "Main Quest" : "Side Quest"}
+        </span>
+        <span className="font-press text-[8px] text-foam/80">
+          #{String(index + 1).padStart(2, "0")}
+        </span>
       </div>
-      <div className="flex flex-1 flex-col bg-white p-5">
-        <h3 className="font-bebas text-2xl leading-tight text-navy">{project.name}</h3>
-        <div className="mt-1 h-0.5 w-8 bg-neon-yellow" />
-        <p className="mt-2 flex-1 text-sm leading-relaxed text-navy/85">{project.description}</p>
+
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <span className="border border-lime bg-lime/20 px-1.5 py-0.5 font-press text-[7px] uppercase text-lime">
+            Cleared
+          </span>
+          <span className="font-press text-[7px] uppercase text-foam/45">
+            Reward · XP + Stack
+          </span>
+        </div>
+        <h3 className="font-pixel text-xl leading-snug text-foam sm:text-2xl">{project.name}</h3>
+        <p className="mt-2 flex-1 text-sm leading-relaxed text-foam/85">{project.description}</p>
         {project.highlights && (
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs leading-relaxed text-navy/70">
+          <ul className="mt-3 space-y-1.5">
             {project.highlights.map((h) => (
-              <li key={h}>{h}</li>
+              <li key={h} className="flex gap-2 text-xs leading-relaxed text-foam/75">
+                <span className="mt-0.5 shrink-0">
+                  <Seashell size={12} />
+                </span>
+                <span>{h}</span>
+              </li>
             ))}
           </ul>
         )}
         <StackChips stack={project.stack} offset={index} />
-        <a
-          href={project.repo}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-block font-bebas tracking-widest text-coral-hot underline-offset-4 hover:underline"
-        >
-          View on GitHub ↗
-        </a>
+        <div className="mt-4">
+          <PixelLink href={project.repo} external variant="primary" className="text-[8px]">
+            Open Repo
+          </PixelLink>
+        </div>
       </div>
     </article>
   );
@@ -70,52 +102,37 @@ export default function ProjectsPage() {
   return (
     <PageShell
       title="Projects"
-      emoji="🌋"
-      accent="the good stuff!"
-      subtitle="From autonomous AI agents to raw-socket network tools — everything built from scratch."
+      accent="quest log unlocked"
+      hudLabel="Quest Log"
+      subtitle="Main quests and side quests from the archipelago - AI agents, cloud apps, and systems tools built from scratch."
     >
-      {/* gear review banner */}
-      <div className="mb-8 flex items-center gap-4">
-        <h2 className="font-bebas text-4xl uppercase text-navy-dark">Gear Reviews</h2>
-        <div className="h-0.5 flex-1 bg-navy/20" />
-        <span className="font-bebas text-sm tracking-[3px] text-coral-hot">FEATURED BUILDS</span>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-press text-[11px] uppercase text-mustard">Main Quests</h2>
+          <p className="mt-1 text-sm text-foam/70">Boss fights. Highest XP drops.</p>
+        </div>
+        <p className="font-press text-[9px] text-foam/50">
+          {featuredProjects.length} Active
+        </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {featuredProjects.map((p, i) => (
-          <FeaturedCard key={p.name} project={p} index={i} />
+          <QuestCard key={p.name} project={p} index={i} kind="main" />
         ))}
       </div>
 
-      {/* more section */}
-      <div className="mt-14 flex items-center gap-4">
-        <h2 className="font-bebas text-3xl uppercase text-navy-dark">More from the Archipelago</h2>
-        <div className="h-0.5 flex-1 bg-navy/20" />
+      <div className="mb-5 mt-14 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-press text-[11px] uppercase text-mustard">Side Quests</h2>
+          <p className="mt-1 text-sm text-foam/70">Optional routes. Still worth the paddle.</p>
+        </div>
+        <p className="font-press text-[9px] text-foam/50">{otherProjects.length} Cleared</p>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {otherProjects.map((p, i) => (
-          <article
-            key={p.name}
-            className={`flex flex-col overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.07)] transition hover:-translate-y-1 ${tilts[(i + 1) % tilts.length]}`}
-          >
-            <div className="bg-navy px-4 py-2">
-              <span className="font-bebas text-xs tracking-[2px] text-neon-yellow">PROJECT</span>
-            </div>
-            <div className="flex flex-1 flex-col bg-white p-4">
-              <h3 className="font-bebas text-lg leading-tight text-navy">{p.name}</h3>
-              <p className="mt-1.5 flex-1 text-sm leading-relaxed text-navy/80">{p.description}</p>
-              <StackChips stack={p.stack} offset={i + 2} />
-              <a
-                href={p.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 font-bebas text-sm tracking-widest text-coral-hot underline-offset-4 hover:underline"
-              >
-                GitHub ↗
-              </a>
-            </div>
-          </article>
+          <QuestCard key={p.name} project={p} index={i} kind="side" />
         ))}
       </div>
     </PageShell>

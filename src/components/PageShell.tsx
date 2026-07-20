@@ -1,123 +1,116 @@
-import Link from "next/link";
 import { site } from "@/data/content";
-import { Hibiscus, Starfish, CircleBadge } from "@/components/Stickers";
+import WaveBackground from "@/components/game/WaveBackground";
+import { PixelLink } from "@/components/game/PixelButton";
+import { WaveIcon } from "@/components/game/SurfMotifs";
 
 export default function PageShell({
   title,
-  emoji,
   subtitle,
-  accent = "surf's up!",
-  section,
+  accent = "press start",
+  hudLabel = "STAGE SELECT",
   children,
 }: {
   title: string;
-  emoji: string;
   subtitle: string;
   accent?: string;
-  section?: string;
+  hudLabel?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-[100svh] flex-col bg-parchment">
-      <header className="relative overflow-hidden bg-parchment pb-12 pt-0 text-center">
-        {/* magazine issue strip */}
-        <div className="flex items-center justify-between bg-navy-dark px-6 py-2">
-          <span className="font-bebas text-sm tracking-[3px] text-neon-yellow">SURF &amp; CODE QUARTERLY</span>
-          <span className="font-bebas text-sm tracking-[2px] text-white/50">ISSUE 01 · SUMMER 2026</span>
-          <span className="font-bebas text-sm tracking-[3px] text-neon-yellow">{(section ?? title).toUpperCase()}</span>
+    <div className="game-cursor relative flex min-h-[100dvh] flex-col overflow-x-hidden text-foam">
+      <WaveBackground />
+
+      <div className="relative z-10 flex min-h-[100dvh] flex-col">
+        {/* HUD top bar */}
+        <div className="flex items-center justify-between border-b-4 border-ink bg-ocean-deep/90 px-3 py-2 backdrop-blur-[2px] sm:px-5">
+          <span className="font-press text-[8px] uppercase tracking-wider text-mustard sm:text-[10px]">
+            Surf Quest · {hudLabel}
+          </span>
+          <span className="hidden font-press text-[9px] text-foam/60 sm:inline">
+            Player 1 · Rahil
+          </span>
+          <span className="font-press text-[8px] uppercase text-lime sm:text-[10px]">
+            HP 100/100
+          </span>
         </div>
 
         {/* nav */}
-        <nav className="relative z-10 mx-auto flex max-w-4xl items-center justify-between px-6 pt-5">
-          <Link
-            href="/"
-            className="sticker px-4 py-2 font-display text-sm text-navy transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
-          >
-            🌊 Back to the ocean
-          </Link>
-          <a
-            href={site.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sticker px-4 py-2 font-display text-sm text-navy transition hover:-translate-y-0.5"
-          >
-            GitHub ↗
-          </a>
+        <nav className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 pt-5 sm:px-6">
+          <PixelLink href="/" variant="secondary">
+            <WaveIcon size={14} />
+            Ocean Map
+          </PixelLink>
+          <PixelLink href={site.github} external variant="accent">
+            GitHub
+          </PixelLink>
         </nav>
 
-        {/* minimal sticker scatter */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 top-8">
-          <div className="absolute left-[5%] top-[38%] -rotate-12 opacity-80 drop-shadow-[3px_3px_0_rgba(10,45,78,0.25)]">
-            <Hibiscus size={58} />
-          </div>
-          <div className="absolute right-[6%] top-[32%] rotate-[10deg] opacity-80 drop-shadow-[3px_3px_0_rgba(10,45,78,0.25)]">
-            <Starfish size={52} />
-          </div>
-          <div className="absolute right-[18%] top-[8%] hidden rotate-6 opacity-60 lg:block">
-            <CircleBadge size={72} />
-          </div>
-        </div>
+        {/* stage title */}
+        <header className="mx-auto w-full max-w-5xl px-4 pb-6 pt-8 text-center sm:px-6">
+          <p className="font-press text-[9px] uppercase tracking-[0.2em] text-mustard sm:text-[10px]">
+            {accent}
+          </p>
+          <h1
+            className="font-pixel mt-3 text-4xl uppercase leading-none text-foam sm:text-5xl md:text-6xl"
+            style={{ textShadow: "4px 4px 0 var(--ink), -2px 0 0 var(--ocean-deep)" }}
+          >
+            {title}
+          </h1>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-foam/85 sm:text-base">
+            {subtitle}
+          </p>
+          <div className="mx-auto mt-5 h-1 w-24 bg-mustard shadow-[4px_0_0_var(--sunset),8px_0_0_var(--coral)]" />
+        </header>
 
-        {/* kicker */}
-        <p className="font-marker relative z-10 mt-10 text-sm tracking-wide text-navy/70">
-          ☼ RAHIL&apos;S SURF LOG — VOL. 1 ☼
-        </p>
-
-        {/* headline */}
-        <h1
-          className="font-dxburst relative z-10 mt-2 text-6xl uppercase text-navy md:text-8xl"
-          style={{ textShadow: "3px 3px 0 var(--neon-yellow), 6px 6px 0 var(--navy-dark)" }}
-        >
-          <span aria-hidden="true" className="mr-2 text-[0.55em]">{emoji}</span>
-          {title}
-        </h1>
-
-        {/* script accent */}
-        <p
+        {/* ticker */}
+        <div
+          className="overflow-hidden border-y-4 border-ink bg-navy/90 py-1.5"
           aria-hidden="true"
-          className="font-script relative z-10 -mt-1 -rotate-2 text-2xl text-coral md:text-3xl"
-          style={{ textShadow: "2px 2px 0 var(--parchment)" }}
         >
-          {accent}
-        </p>
-
-        {/* subtitle */}
-        <p className="font-editorial relative z-10 mx-auto mt-3 max-w-xl text-lg italic text-navy/70">
-          {subtitle}
-        </p>
-      </header>
-
-      {/* scrolling marquee */}
-      <div className="overflow-hidden border-y-4 border-navy-dark bg-navy-dark py-1.5" aria-hidden="true">
-        <div className="marquee-track flex w-max">
-          {[0, 1].map((copy) => (
-            <span key={copy} className="font-bebas whitespace-nowrap text-sm tracking-[0.2em] text-parchment">
-              {Array.from({ length: 6 })
-                .map(() => `${title.toUpperCase()} · SURF · BUILD · REPEAT · `)
-                .join("")}
-            </span>
-          ))}
+          <div className="marquee-track flex w-max">
+            {[0, 1].map((copy) => (
+              <span
+                key={copy}
+                className="font-press whitespace-nowrap text-[9px] tracking-[0.18em] text-mustard sm:text-[10px]"
+              >
+                {Array.from({ length: 5 })
+                  .map(() => `${title.toUpperCase()} · CATCH THE WAVE · BUILD · SHIP · `)
+                  .join("")}
+              </span>
+            ))}
+          </div>
         </div>
+
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">{children}</main>
+
+        <footer className="border-t-4 border-ink bg-ocean-deep/95 px-4 py-5 text-center sm:px-6">
+          <p className="font-press text-[8px] leading-relaxed text-foam/70 sm:text-[9px]">
+            {site.name}
+            {" · "}
+            <a className="text-mustard underline-offset-2 hover:underline" href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+            {" · "}
+            <a
+              className="text-mustard underline-offset-2 hover:underline"
+              href={site.github}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+            {" · "}
+            <a
+              className="text-mustard underline-offset-2 hover:underline"
+              href={site.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn
+            </a>
+          </p>
+        </footer>
       </div>
-
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-12">{children}</main>
-
-      <footer className="px-6 pb-8 text-center text-sm text-navy/60">
-        <p>
-          {site.name} ·{" "}
-          <a className="underline hover:text-navy" href={`mailto:${site.email}`}>
-            {site.email}
-          </a>{" "}
-          ·{" "}
-          <a className="underline hover:text-navy" href={site.github} target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>{" "}
-          ·{" "}
-          <a className="underline hover:text-navy" href={site.linkedin} target="_blank" rel="noopener noreferrer">
-            LinkedIn
-          </a>
-        </p>
-      </footer>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
 import TreasureChest from "@/components/TreasureChest";
+import { PixelLink } from "@/components/game/PixelButton";
+import { Seashell } from "@/components/game/SurfMotifs";
 import { achievements } from "@/data/content";
 
 export const metadata: Metadata = {
@@ -11,15 +13,21 @@ export const metadata: Metadata = {
 
 function Buoy() {
   return (
-    <svg width="56" height="72" viewBox="0 0 56 72" fill="none" aria-hidden="true" className="animate-buoy">
-      {/* mast light */}
-      <circle cx="28" cy="8" r="5" fill="#fde047" />
-      <rect x="26" y="12" width="4" height="10" fill="#475569" />
-      {/* body */}
-      <path d="M14 26 Q14 20 28 20 Q42 20 42 26 L40 52 Q40 58 28 58 Q16 58 16 52 Z" fill="#ef4444" />
-      <path d="M15 34 L41 34 L40.4 42 L15.6 42 Z" fill="#f8fafc" />
-      {/* water ripple */}
-      <ellipse cx="28" cy="62" rx="20" ry="4" stroke="#38bdf8" strokeWidth="2.5" fill="none" opacity="0.7" />
+    <svg
+      width="48"
+      height="64"
+      viewBox="0 0 48 64"
+      fill="none"
+      aria-hidden="true"
+      className="animate-buoy"
+      shapeRendering="crispEdges"
+    >
+      <rect x="20" y="2" width="8" height="6" fill="#fde047" />
+      <rect x="22" y="8" width="4" height="8" fill="#475569" />
+      <rect x="12" y="18" width="24" height="28" fill="#ef4444" />
+      <rect x="12" y="28" width="24" height="8" fill="#f8fafc" />
+      <rect x="8" y="50" width="32" height="4" fill="#38bdf8" opacity="0.7" />
+      <rect x="12" y="56" width="24" height="3" fill="#0ea5e9" opacity="0.5" />
     </svg>
   );
 }
@@ -28,37 +36,61 @@ export default function AchievementsPage() {
   return (
     <PageShell
       title="Achievements"
-      emoji="🏆"
-      accent="trophy shelf!"
-      subtitle="Buoy markers on the water — each one flags something I'm proud of."
+      accent="trophy shelf"
+      hudLabel="Trophy Room"
+      subtitle="Unlocked buoys on the water - each one flags a clear you earned."
     >
-      <ol className="space-y-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="font-press text-[9px] uppercase text-mustard">
+          Collection · {achievements.length} / {achievements.length}
+        </p>
+        <p className="font-press text-[8px] text-lime">All unlocked</p>
+      </div>
+
+      <ol className="space-y-5">
         {achievements.map((a, i) => (
-          <li key={a.title} className="flex items-start gap-4">
-            <div style={{ animationDelay: `${i * 0.6}s` }} className="shrink-0">
+          <li key={a.title} className="flex items-start gap-3 sm:gap-4">
+            <div
+              style={{ animationDelay: `${i * 0.55}s` }}
+              className="shrink-0 pt-1"
+            >
               <Buoy />
             </div>
-            <article className={`sticker flex-1 p-6 ${i % 2 ? "-rotate-[0.5deg]" : "rotate-[0.5deg]"}`}>
-              <h2 className="font-display text-lg text-navy">{a.title}</h2>
-              <p className="mt-2 text-sm text-navy/80">{a.detail}</p>
+            <article className="pixel-panel flex-1 p-4 sm:p-5">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="border-2 border-ink bg-lime px-2 py-0.5 font-press text-[7px] uppercase text-navy">
+                  Unlocked
+                </span>
+                <span className="font-press text-[8px] text-foam/45">
+                  Badge #{String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <h2 className="font-pixel text-xl leading-snug text-foam sm:text-2xl">
+                {a.title}
+              </h2>
+              <p className="mt-2 flex gap-2 text-sm leading-relaxed text-foam/85">
+                <span className="mt-0.5 shrink-0">
+                  <Seashell size={12} />
+                </span>
+                <span>{a.detail}</span>
+              </p>
               {a.link && (
-                <a
-                  href={a.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-block font-display text-sm text-coral underline-offset-4 hover:underline"
-                >
-                  View project ↗
-                </a>
+                <div className="mt-4">
+                  <PixelLink href={a.link} external variant="primary" className="text-[8px]">
+                    View Project
+                  </PixelLink>
+                </div>
               )}
             </article>
           </li>
         ))}
       </ol>
 
-      <section className="sticker mt-14 bg-gradient-to-b from-amber-50 to-paper p-8 text-center">
-        <h2 className="font-display text-2xl text-navy">Buried treasure</h2>
-        <p className="mt-1 text-sm text-navy/70">A little extra loot from my GitHub profile.</p>
+      <section className="pixel-panel-light mt-12 p-6 text-center sm:p-8">
+        <h2 className="font-pixel text-2xl uppercase text-navy">Buried Treasure</h2>
+        <p className="mt-2 text-sm text-navy/70">
+          Extra loot from the GitHub profile. Crack the chest.
+        </p>
         <div className="mt-4">
           <TreasureChest />
         </div>

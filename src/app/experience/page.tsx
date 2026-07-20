@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
+import { ShellBullet, Surfboard } from "@/components/game/SurfMotifs";
 import { experience } from "@/data/content";
 
 export const metadata: Metadata = {
@@ -9,74 +10,55 @@ export const metadata: Metadata = {
 };
 
 const stampColors = [
-  { bg: "bg-neon-yellow", text: "text-navy-dark", rotate: "-rotate-3" },
-  { bg: "bg-neon-yellow", text: "text-navy-dark", rotate: "rotate-2" },
-  { bg: "bg-coral-hot", text: "text-white", rotate: "-rotate-2" },
-  { bg: "bg-coral-hot", text: "text-white", rotate: "rotate-3" },
-];
-
-const headerColors = [
-  "bg-navy-dark",
-  "bg-navy-dark",
-  "bg-coral",
-  "bg-coral",
+  "bg-mustard text-navy",
+  "bg-tealsurf text-foam",
+  "bg-sunset text-foam",
+  "bg-coral text-foam",
 ];
 
 export default function ExperiencePage() {
   return (
     <PageShell
       title="Experience"
-      emoji="🗼"
-      accent="the grind"
-      subtitle="Roles, runs, and the work that shaped the surfer."
+      accent="campaign journal"
+      hudLabel="Campaign Log"
+      subtitle="Chapters paddled through - startups, campus leadership, and real client work."
     >
-      <ol className="space-y-8">
-        {experience.map((job, i) => {
-          const stamp = stampColors[i % stampColors.length];
-          const header = headerColors[i % headerColors.length];
-          return (
-            <li key={job.company}>
-              <article
-                className="overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.08)]"
-                style={{ transform: `rotate(${i % 2 ? "-0.4deg" : "0.4deg"})` }}
-              >
-                {/* LOG header strip */}
-                <div className={`flex items-center justify-between px-6 py-3 ${header}`}>
-                  <span className="font-bebas text-xl tracking-[3px] text-neon-yellow">
-                    LOG {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="font-sans text-xs font-bold uppercase tracking-widest text-white/60">
-                    {job.period}
-                  </span>
+      <ol className="space-y-6">
+        {experience.map((job, i) => (
+          <li key={job.company}>
+            <article className="pixel-panel overflow-hidden">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b-4 border-ink bg-navy/50 px-4 py-2.5">
+                <span className="inline-flex items-center gap-2 font-press text-[9px] uppercase text-mustard">
+                  <Surfboard size={12} />
+                  Chapter {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="font-press text-[8px] uppercase text-foam/55">{job.period}</span>
+              </div>
+
+              <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:p-5">
+                <div className="flex-1">
+                  <h2 className="font-pixel text-2xl uppercase leading-tight text-foam sm:text-3xl">
+                    {job.company}
+                  </h2>
+                  <p className="mt-1 text-base text-mustard sm:text-lg">{job.role}</p>
+                  <p className="mt-1 text-sm text-foam/55">{job.location}</p>
+                  <ul className="mt-4 space-y-2">
+                    {job.points.map((pt) => (
+                      <ShellBullet key={pt}>{pt}</ShellBullet>
+                    ))}
+                  </ul>
                 </div>
 
-                {/* body */}
-                <div className="flex items-start gap-6 bg-white p-6">
-                  <div className="flex-1">
-                    <h2 className="font-bebas text-4xl leading-none text-navy">
-                      {job.company.toUpperCase()}
-                    </h2>
-                    <p className="font-editorial mt-1 text-xl italic text-coral">{job.role}</p>
-                    <div className="mt-2 h-0.5 w-10 bg-neon-yellow" />
-                    <p className="mt-1 text-sm text-navy/55">{job.location}</p>
-                    <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-navy/80">
-                      {job.points.map((pt) => (
-                        <li key={pt}>{pt}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* stamp badge */}
-                  <div
-                    className={`flex h-20 w-20 shrink-0 items-center justify-center ${stamp.bg} ${stamp.rotate}`}
-                  >
-                    <span className={`font-bebas text-2xl ${stamp.text}`}>{job.stamp}</span>
-                  </div>
+                <div
+                  className={`flex h-16 w-16 shrink-0 items-center justify-center border-4 border-ink font-press text-sm shadow-[4px_4px_0_var(--ink)] sm:h-20 sm:w-20 sm:text-base ${stampColors[i % stampColors.length]}`}
+                >
+                  {job.stamp}
                 </div>
-              </article>
-            </li>
-          );
-        })}
+              </div>
+            </article>
+          </li>
+        ))}
       </ol>
     </PageShell>
   );

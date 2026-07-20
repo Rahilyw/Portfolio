@@ -3,21 +3,11 @@ import {
   Geist,
   Geist_Mono,
   Pixelify_Sans,
+  Press_Start_2P,
   Titan_One,
-  Pacifico,
-  Permanent_Marker,
-  Bebas_Neue,
-  Newsreader,
 } from "next/font/google";
-import localFont from "next/font/local";
 import { site, siteUrl } from "@/data/content";
 import "./globals.css";
-
-const dxBurst = localFont({
-  src: "./fonts/DxBurst-Regular.otf",
-  variable: "--font-dxburst",
-  display: "swap",
-});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,35 +25,16 @@ const pixelify = Pixelify_Sans({
   weight: ["400", "500", "600"],
 });
 
+const pressStart = Press_Start_2P({
+  variable: "--font-press",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 const titanOne = Titan_One({
   variable: "--font-retro",
   subsets: ["latin"],
   weight: "400",
-});
-
-const pacifico = Pacifico({
-  variable: "--font-script",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const marker = Permanent_Marker({
-  variable: "--font-marker",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const bebasNeue = Bebas_Neue({
-  variable: "--font-bebas",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const newsreader = Newsreader({
-  variable: "--font-editorial",
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  style: ["normal", "italic"],
 });
 
 const description =
@@ -120,7 +91,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${titanOne.variable} ${pacifico.variable} ${marker.variable} ${bebasNeue.variable} ${newsreader.variable} ${dxBurst.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${pixelify.variable} ${pressStart.variable} ${titanOne.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <script

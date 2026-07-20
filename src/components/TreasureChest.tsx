@@ -46,8 +46,8 @@ export default function TreasureChest() {
             </g>
           )}
         </svg>
-        <p className="mt-1 text-sm font-medium text-ink/70 transition group-hover:text-ink">
-          {open ? "GitHub badge loot!" : "Psst… open the chest"}
+        <p className="mt-1 font-press text-[9px] uppercase text-ink/70 transition group-hover:text-ink">
+          {open ? "GitHub badge loot!" : "Psst... open the chest"}
         </p>
       </button>
 
@@ -65,9 +65,9 @@ export default function TreasureChest() {
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.12 * i, type: "spring", stiffness: 300, damping: 18 }}
-                className="rounded-full border border-amber-300 bg-amber-100 px-4 py-1.5 text-sm font-medium text-amber-900 shadow-sm"
+                className="border-2 border-ink bg-mustard px-3 py-1.5 font-press text-[8px] uppercase text-navy shadow-[3px_3px_0_var(--ink)]"
               >
-                🏅 {badge}
+                {badge}
               </motion.li>
             ))}
           </motion.ul>

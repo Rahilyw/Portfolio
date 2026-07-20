@@ -21,11 +21,6 @@
   --peach: #ffd9b0;
   --hotpink: #f72585;
   --lime: #a4d92c;
-  /* magazine palette */
-  --parchment: #F2EDD7;
-  --navy-dark: #0A2D4E;
-  --neon-yellow: #FFE000;
-  --coral-hot: #FF5F35;
 }
 
 @theme inline {
@@ -48,10 +43,6 @@
   --color-peach: var(--peach);
   --color-hotpink: var(--hotpink);
   --color-lime: var(--lime);
-  --color-parchment: var(--parchment);
-  --color-navy-dark: var(--navy-dark);
-  --color-neon-yellow: var(--neon-yellow);
-  --color-coral-hot: var(--coral-hot);
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-retro);
   --font-mono: var(--font-geist-mono);
@@ -76,27 +67,11 @@ body {
   font-family: var(--font-pixel), var(--font-geist-sans), sans-serif;
 }
 
-.font-script {
-  font-family: var(--font-script), cursive;
+.font-press {
+  font-family: var(--font-press), var(--font-pixel), var(--font-geist-mono), monospace;
 }
 
-.font-marker {
-  font-family: var(--font-marker), cursive;
-}
-
-.font-dxburst {
-  font-family: var(--font-dxburst), var(--font-bebas), var(--font-retro), sans-serif;
-}
-
-.font-bebas {
-  font-family: var(--font-bebas), var(--font-retro), sans-serif;
-}
-
-.font-editorial {
-  font-family: var(--font-editorial), Georgia, serif;
-}
-
-/* magazine cover-line marquee */
+/* HUD ticker marquee */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -112,17 +87,83 @@ body {
   }
 }
 
-/* vintage surf-shop sticker card */
-.sticker {
-  border: 3px solid var(--navy);
-  border-radius: 1.1rem;
-  background: var(--paper);
-  box-shadow: 5px 5px 0 var(--navy);
+/* chunky 8-bit panel */
+.pixel-panel {
+  border: 4px solid var(--ink);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--ocean-deep) 88%, black);
+  box-shadow: 6px 6px 0 var(--ink);
+  color: var(--foam);
 }
 
-@keyframes sun-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.pixel-panel-light {
+  border: 4px solid var(--ink);
+  border-radius: 0;
+  background: var(--cream);
+  box-shadow: 6px 6px 0 var(--ink);
+  color: var(--navy);
+}
+
+.pixel-btn {
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--ink);
+  image-rendering: pixelated;
+  transition: transform 80ms steps(2), box-shadow 80ms steps(2), background-color 120ms ease;
+}
+
+.pixel-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.pixel-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.pixel-btn:focus-visible {
+  outline: 3px solid var(--mustard);
+  outline-offset: 3px;
+}
+
+/* panels bobbing on the tide */
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-panel {
+  animation: float-bob 4.5s ease-in-out infinite;
+}
+
+/* stat-bar cells pop in one block at a time (delay set per cell inline) */
+@keyframes cell-pop {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.stat-cell {
+  animation: cell-pop 60ms steps(1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-panel,
+  .stat-cell {
+    animation: none !important;
+  }
+}
+
+/* pixel-art stepped-arrow cursors on precise pointers */
+@media (pointer: fine) {
+  .game-cursor {
+    cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='18'%20height='22'%20viewBox='-1%20-1%2010%2012'%20shape-rendering='crispEdges'%3E%3Cdefs%3E%3Cg%20id='a'%3E%3Crect%20x='0'%20y='0'%20width='1'%20height='1'/%3E%3Crect%20x='0'%20y='1'%20width='2'%20height='1'/%3E%3Crect%20x='0'%20y='2'%20width='3'%20height='1'/%3E%3Crect%20x='0'%20y='3'%20width='4'%20height='1'/%3E%3Crect%20x='0'%20y='4'%20width='5'%20height='1'/%3E%3Crect%20x='0'%20y='5'%20width='6'%20height='1'/%3E%3Crect%20x='0'%20y='6'%20width='3'%20height='1'/%3E%3Crect%20x='0'%20y='7'%20width='1'%20height='1'/%3E%3Crect%20x='2'%20y='7'%20width='2'%20height='1'/%3E%3Crect%20x='2'%20y='8'%20width='2'%20height='1'/%3E%3C/g%3E%3C/defs%3E%3Cuse%20href='%23a'%20fill='%23f0fbff'%20x='1'/%3E%3Cuse%20href='%23a'%20fill='%23f0fbff'%20y='1'/%3E%3Cuse%20href='%23a'%20fill='%23f0fbff'%20x='-1'/%3E%3Cuse%20href='%23a'%20fill='%23f0fbff'%20y='-1'/%3E%3Cuse%20href='%23a'%20fill='%23083344'/%3E%3C/svg%3E") 2 2, auto;
+  }
+  .game-cursor a,
+  .game-cursor button,
+  .game-cursor [role="button"] {
+    cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='18'%20height='22'%20viewBox='-1%20-1%2010%2012'%20shape-rendering='crispEdges'%3E%3Cdefs%3E%3Cg%20id='a'%3E%3Crect%20x='0'%20y='0'%20width='1'%20height='1'/%3E%3Crect%20x='0'%20y='1'%20width='2'%20height='1'/%3E%3Crect%20x='0'%20y='2'%20width='3'%20height='1'/%3E%3Crect%20x='0'%20y='3'%20width='4'%20height='1'/%3E%3Crect%20x='0'%20y='4'%20width='5'%20height='1'/%3E%3Crect%20x='0'%20y='5'%20width='6'%20height='1'/%3E%3Crect%20x='0'%20y='6'%20width='3'%20height='1'/%3E%3Crect%20x='0'%20y='7'%20width='1'%20height='1'/%3E%3Crect%20x='2'%20y='7'%20width='2'%20height='1'/%3E%3Crect%20x='2'%20y='8'%20width='2'%20height='1'/%3E%3C/g%3E%3C/defs%3E%3Cuse%20href='%23a'%20fill='%23083344'%20x='1'/%3E%3Cuse%20href='%23a'%20fill='%23083344'%20y='1'/%3E%3Cuse%20href='%23a'%20fill='%23083344'%20x='-1'/%3E%3Cuse%20href='%23a'%20fill='%23083344'%20y='-1'/%3E%3Cuse%20href='%23a'%20fill='%23f4793b'/%3E%3C/svg%3E") 2 2, pointer;
+  }
 }
 
 /* ----- landing scene animations ----- */
