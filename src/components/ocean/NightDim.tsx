@@ -14,13 +14,15 @@ export default function NightDim({
   children: React.ReactNode;
   className?: string;
 }) {
-  const { night } = useDayNight();
+  const { night, live } = useDayNight();
   return (
     <div
       className={className}
       style={{
         filter: `brightness(${1 - 0.38 * night}) saturate(${1 - 0.22 * night})`,
-        transition: "filter 2.5s linear",
+        // no transition until the clock is live — a remount snaps straight to
+        // the current dimness instead of fading in from daylight
+        transition: live ? "filter 2.5s linear" : "none",
       }}
     >
       {children}

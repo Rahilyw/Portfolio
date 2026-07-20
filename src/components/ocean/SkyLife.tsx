@@ -22,7 +22,7 @@ const CLOUDS = [
 type Flyby = { key: number; top: number };
 
 export default function SkyLife() {
-  const { t, night } = useDayNight();
+  const { t, night, live } = useDayNight();
   const reduce = useReducedMotion();
   const [plane, setPlane] = useState<Flyby | null>(null);
 
@@ -59,10 +59,12 @@ export default function SkyLife() {
   }, [reduce]);
 
   const day = 1 - night;
+  // transitions stay off until the clock is live, so remounts snap to the
+  // current cycle position instead of racing there from the SSR default
   const dimStyle = {
     opacity: 1 - 0.45 * night,
     filter: `brightness(${1 - 0.45 * night})`,
-    transition: "opacity 2.5s linear, filter 2.5s linear",
+    transition: live ? "opacity 2.5s linear, filter 2.5s linear" : "none",
   };
 
   // sun rides t ∈ [0, 0.5), moon t ∈ [0.5, 1) — both arc over the sky band
@@ -73,10 +75,17 @@ export default function SkyLife() {
     top: `${58 - 40 * Math.sin(Math.PI * p)}%`,
   });
 
+  const arcTransition = live
+    ? "left 1.2s linear, top 1.2s linear, opacity 2s linear"
+    : "none";
+
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[42%]"
+      // hidden until the clock syncs: the SSR default would otherwise paint
+      // one frame of noon sky before snapping to the real cycle position
+      style={{ visibility: live ? undefined : "hidden" }}
     >
       {/* sun + moon */}
       {sunP !== null && (
@@ -85,7 +94,7 @@ export default function SkyLife() {
           style={{
             ...arc(sunP),
             opacity: Math.min(1, Math.sin(Math.PI * sunP) * 3) * day,
-            transition: "left 1.2s linear, top 1.2s linear, opacity 2s linear",
+            transition: arcTransition,
           }}
         >
           <DecorSprite kind="sun" />
@@ -97,7 +106,7 @@ export default function SkyLife() {
           style={{
             ...arc(moonP),
             opacity: Math.min(1, Math.sin(Math.PI * moonP) * 3) * night,
-            transition: "left 1.2s linear, top 1.2s linear, opacity 2s linear",
+            transition: arcTransition,
           }}
         >
           <DecorSprite kind="moon" />
@@ -133,7 +142,7 @@ export default function SkyLife() {
         <div className="animate-bob-slow" style={{ animationDuration: "6s" }}>
           <DecorSprite
             kind="balloon"
-            style={{ opacity: day, transition: "opacity 2.5s linear" }}
+            style={{ opacity: day, transition: live ? "opacity 2.5s linear" : "none" }}
           />
         </div>
       </div>

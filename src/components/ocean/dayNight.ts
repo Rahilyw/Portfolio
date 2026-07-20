@@ -30,18 +30,36 @@ export function nightness(now: number): number {
   return 1 - smooth(0.25 - RAMP, 0.25 + RAMP, d);
 }
 
-/** Ticks once a second with the current cycle position and nightness. */
+/**
+ * Ticks once a second with the current cycle position and nightness.
+ *
+ * `live` is false until the clock has synced AND that synced position has
+ * rendered. Consumers must suppress their CSS transitions while !live and
+ * only animate once live — otherwise every page navigation replays a
+ * "correction" from the deterministic SSR default (noon) to the real cycle
+ * position, and the sun/moon visibly race across the sky.
+ */
 export function useDayNight() {
   // deterministic daytime default so SSR and first client render agree
-  const [state, setState] = useState({ t: 0.25, night: 0 });
+  const [state, setState] = useState({ t: 0.25, night: 0, live: false });
   useEffect(() => {
-    const tick = () =>
-      setState({ t: cycleT(Date.now()), night: nightness(Date.now()) });
-    // first tick lands right after paint; transitions smooth the correction
-    const first = setTimeout(tick, 0);
-    const id = setInterval(tick, 1000);
+    const at = (live: boolean) => ({
+      t: cycleT(Date.now()),
+      night: nightness(Date.now()),
+      live,
+    });
+    // snap to the real position with transitions still off, THEN arm
+    // transitions one beat later — chained so the arm can never win the race
+    // and re-enable transitions before the snap has rendered
+    let arm: ReturnType<typeof setTimeout> | undefined;
+    const snap = setTimeout(() => {
+      setState(at(false));
+      arm = setTimeout(() => setState((s) => ({ ...s, live: true })), 60);
+    }, 0);
+    const id = setInterval(() => setState(at(true)), 1000);
     return () => {
-      clearTimeout(first);
+      clearTimeout(snap);
+      if (arm !== undefined) clearTimeout(arm);
       clearInterval(id);
     };
   }, []);
