@@ -81,9 +81,10 @@ function drawSurfer(g: Ctx, t: number, phase: number) {
   const pitch = (Math.sin(phase + 0.6) * 3 * Math.PI) / 180;
 
   g.save();
-  // whole rider+board group tilts as one, riding slightly downhill
+  // whole rider+board group tilts as one — nose lifted, planing across the
+  // water the way a real board rides (tail sits low, nose rides up)
   g.translate(20, 41.5);
-  g.rotate(-0.1 + pitch);
+  g.rotate(0.08 + pitch);
   g.translate(-20, -41.5);
 
   // contact shadow grounding the board on the water — sea-dark, not black
