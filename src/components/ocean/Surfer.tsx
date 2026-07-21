@@ -10,8 +10,24 @@ const SCALE = 2;
 const CYCLE_S = (FRAME_COUNT * 60) / 1000;
 /** How far below the horizon line the rider's waterline is allowed to reach. */
 const SEA_MARGIN = 40;
-/** Smoothed horizontal velocity needed before the rider turns around. */
-const TURN_THRESHOLD = 4;
+
+/**
+ * Physics tuning. Every rate is expressed per SECOND and applied through
+ * exponential smoothing (`1 - e^(-k·dt)`), so the feel is identical at 60,
+ * 120, or 144 Hz — the old fixed per-frame lerps ran twice as fast on a
+ * high-refresh display.
+ */
+const CHASE_K = 20; // how eagerly the board chases the cursor (higher = tighter)
+const VEL_K = 15; // board-velocity smoothing
+const FACE_K = 14; // how fast the rider banks around when turning
+const LEAN_K = 11; // tilt smoothing
+const LIFT_K = 8; // planing-lift smoothing
+const TURN_DEADZONE = 220; // px/s of sideways speed before committing a turn
+const MAX_TILT = 15; // degrees of carve lean
+/** px/s at which the wake and planing lift reach full strength. */
+const FULL_SPEED = 1900;
+
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
 const DISPLAY = FRAME_SIZE * SCALE;
 const SHEET_W = FRAME_COUNT * DISPLAY;
@@ -27,13 +43,14 @@ function rnd(seed: number): number {
 }
 
 /**
- * Paints a small scrolling wake beneath the board. Speed and direction
- * from cursor velocity drive crest height, scroll rate, and foam density.
+ * Paints a small scrolling wake beneath the board. `intensity` (0..1, from
+ * the board's real speed) and travel direction drive crest height, scroll
+ * rate, and foam density.
  */
 function drawWake(
   ctx: CanvasRenderingContext2D,
   t: number,
-  speed: number,
+  intensity: number,
   dirX: number
 ) {
   const w = WAKE_W;
@@ -41,7 +58,6 @@ function drawWake(
   const img = ctx.createImageData(w, h);
   const data = img.data;
 
-  const intensity = Math.min(1, speed / 18);
   const scroll = t * (2.2 + intensity * 4) * (dirX >= 0 ? 1 : -1);
   const amp = 0.35 + intensity * 0.9;
 
@@ -110,10 +126,14 @@ function drawWake(
 /**
  * The cursor-surfer mini-game: a 12-frame procedurally painted sprite sheet
  * (see surferSheet.ts) playing on a CSS steps() loop, riding a div that
- * chases the mouse with a slight physical lag.
+ * chases the mouse with a springy physical lag.
  *
- * A small interactive wake canvas scrolls beneath the board — crests grow
- * and foam churns faster the harder you carve.
+ * The board's own screen velocity — not the raw cursor gap — drives the
+ * feel: it banks smoothly into turns (mirroring through an edge-on flip),
+ * leans into the carve, dips its nose when dropping down the face, and
+ * planes a touch higher the faster it rides. A small interactive wake canvas
+ * scrolls beneath it, crests growing and foam churning with speed. All
+ * smoothing is dt-based, so it feels the same at any refresh rate.
  */
 export default function Surfer() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -140,9 +160,12 @@ export default function Surfer() {
     const pos = { x: mouse.x, y: mouse.y };
     let seen = false;
     let raf = 0;
-    let velX = 0;
-    let speed = 0;
-    let facing = 1;
+    let velX = 0; // smoothed board velocity, px/s
+    let velY = 0;
+    let facing = 1; // continuous −1..1; lerps so the flip banks, not snaps
+    let faceTarget = 1;
+    let lean = 0; // smoothed carve tilt, degrees
+    let lift = 0; // smoothed planing lift, px
     let wakeT = 0;
     let lastNow = performance.now();
 
@@ -167,22 +190,46 @@ export default function Surfer() {
         const seaTop = window.innerHeight * HORIZON + SEA_MARGIN;
         const targetY = Math.max(mouse.y, seaTop);
 
-        const dx = mouse.x - pos.x;
-        const dy = targetY - pos.y;
-        pos.x += dx * 0.35;
-        pos.y += dy * 0.35;
+        // frame-rate-independent chase toward the cursor
+        const chase = 1 - Math.exp(-CHASE_K * dt);
+        const nextX = pos.x + (mouse.x - pos.x) * chase;
+        const nextY = pos.y + (targetY - pos.y) * chase;
 
-        velX = velX * 0.8 + dx * 0.2;
-        speed = speed * 0.85 + Math.hypot(dx, dy) * 0.15;
+        // the board's actual screen velocity (px/s) is what drives the feel
+        const instVX = (nextX - pos.x) / dt;
+        const instVY = (nextY - pos.y) / dt;
+        pos.x = nextX;
+        pos.y = nextY;
 
-        if (velX > TURN_THRESHOLD) facing = -1;
-        else if (velX < -TURN_THRESHOLD) facing = 1;
+        const velSmooth = 1 - Math.exp(-VEL_K * dt);
+        velX += (instVX - velX) * velSmooth;
+        velY += (instVY - velY) * velSmooth;
+        const speed = Math.hypot(velX, velY);
 
-        const tilt = Math.round(Math.max(-16, Math.min(16, dx * 0.5)) / 4) * 4;
-        el.style.transform = `translate(${Math.round(pos.x)}px, ${Math.round(pos.y)}px) translate(-50%, -66%) rotate(${tilt}deg) scaleX(${facing})`;
+        // commit a turn only past a deadzone (hysteresis), then bank into it
+        // smoothly — as `facing` crosses 0 the sprite goes edge-on and flips
+        if (velX > TURN_DEADZONE) faceTarget = -1;
+        else if (velX < -TURN_DEADZONE) faceTarget = 1;
+        facing += (faceTarget - facing) * (1 - Math.exp(-FACE_K * dt));
+
+        // carve lean from sideways speed + a nose dip when dropping down the
+        // face (positive velY = moving down-screen). Both in screen space, so
+        // the mirror handles left/right correctly.
+        const targetLean =
+          clamp(velX * 0.006, -MAX_TILT, MAX_TILT) + clamp(velY * 0.004, -5, 5);
+        lean += (targetLean - lean) * (1 - Math.exp(-LEAN_K * dt));
+
+        // planing: rides a little higher the faster it goes
+        const targetLift = -Math.min(speed / FULL_SPEED, 1) * 3;
+        lift += (targetLift - lift) * (1 - Math.exp(-LIFT_K * dt));
+
+        el.style.transform =
+          `translate(${Math.round(pos.x)}px, ${Math.round(pos.y + lift)}px) ` +
+          `translate(-50%, -66%) rotate(${lean.toFixed(2)}deg) scaleX(${facing.toFixed(3)})`;
 
         if (wakeCtx) {
-          drawWake(wakeCtx, wakeT, speed, facing === -1 ? 1 : -1);
+          const intensity = Math.min(1, speed / FULL_SPEED);
+          drawWake(wakeCtx, wakeT, intensity, facing < 0 ? 1 : -1);
         }
       }
       raf = requestAnimationFrame(loop);
