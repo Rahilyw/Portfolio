@@ -35,9 +35,9 @@ const SHEET_W = FRAME_COUNT * DISPLAY;
 /** Where the board meets the water, in css px below the transform anchor. */
 const CONTACT_DY = 8;
 /** How far behind the anchor the tail/wake sits, in css px. */
-const TAIL_BACK = 30;
+const TAIL_BACK = 24;
 /** Ceiling on live water-FX particles (trail + spray). */
-const MAX_PARTS = 320;
+const MAX_PARTS = 180;
 
 /**
  * One water-FX particle, stored in ART-pixel units (viewport px / PX) so the
@@ -209,70 +209,71 @@ export default function Surfer() {
         const perpX = -dirY; // perpendicular to travel, for the V-wake
         const perpY = dirX;
 
-        if (speed > 45) {
-          // persistent foam dab on the path → a lingering wake trail
+        if (speed > 70) {
+          // short-lived foam dab on the path → a compact wake that hugs the
+          // board instead of a long lingering ribbon
           emit(
             tailX + rand(-2, 2),
             tailY + rand(-1.5, 1.5),
-            rand(-8, 8),
-            rand(-6, 4),
-            rand(0.85, 1.4),
-            Math.random() < 0.3 ? 2 : 1,
+            rand(-5, 5),
+            rand(-4, 3),
+            rand(0.35, 0.6),
+            Math.random() < 0.25 ? 2 : 1,
             0,
-            0.7
+            0.65
           );
           // two diverging crests spreading off the tail (the V-wake)
-          if (speed > 150) {
-            const spread = 40 + Math.min(speed * 0.05, 70);
+          if (speed > 220) {
+            const spread = 20 + Math.min(speed * 0.03, 36);
             for (const side of [1, -1]) {
               emit(
                 tailX,
                 tailY,
-                perpX * side * spread - dirX * 20,
-                perpY * side * spread - dirY * 20,
-                rand(0.5, 0.85),
+                perpX * side * spread - dirX * 14,
+                perpY * side * spread - dirY * 14,
+                rand(0.28, 0.46),
                 1,
-                60,
-                0.6
+                50,
+                0.5
               );
             }
           }
         }
 
         // carve spray: kicked back and up off the tail, arcs under gravity;
-        // more of it, thrown harder, the faster the board is driving
-        const sprayI = clamp((speed - 260) / 1000, 0, 1);
-        const nSpray = Math.floor(sprayI * 4) + (Math.random() < sprayI ? 1 : 0);
+        // a quick flick, more of it only when really driving hard
+        const sprayI = clamp((speed - 340) / 1100, 0, 1);
+        const nSpray = Math.floor(sprayI * 2.5) + (Math.random() < sprayI * 0.7 ? 1 : 0);
         for (let s = 0; s < nSpray; s++) {
-          const back = rand(120, 300) * sprayI + 60;
+          const back = rand(70, 150) * sprayI + 35;
           emit(
-            tailX + rand(-4, 4),
-            tailY + rand(-3, 3),
-            -dirX * back + rand(-90, 90),
-            -dirY * back - rand(150, 300), // upward kick
-            rand(0.3, 0.65),
-            Math.random() < 0.25 ? 2 : 1,
+            tailX + rand(-3, 3),
+            tailY + rand(-2.5, 2.5),
+            -dirX * back + rand(-60, 60),
+            -dirY * back - rand(100, 180), // upward kick
+            rand(0.2, 0.4),
+            Math.random() < 0.2 ? 2 : 1,
             980,
-            0.9
+            0.85
           );
         }
 
         // splash burst the instant the board commits to a new turn direction
-        if (faceTarget !== lastFaceTarget && speed > 240) {
+        if (faceTarget !== lastFaceTarget && speed > 260) {
           const side = faceTarget < lastFaceTarget ? 1 : -1;
-          for (let s = 0; s < 12; s++) {
+          for (let s = 0; s < 7; s++) {
             const ang = rand(-0.5, 0.5);
-            const kx = perpX * side * rand(120, 300) - dirX * rand(40, 120);
-            const ky = perpY * side * rand(120, 300) - dirY * rand(40, 120) - rand(180, 320);
+            const kx = perpX * side * rand(80, 175) - dirX * rand(30, 80);
+            const ky = perpY * side * rand(80, 175) - dirY * rand(30, 80) - rand(120, 200);
             emit(
               tailX,
               tailY,
               kx * Math.cos(ang),
               ky - Math.abs(kx) * Math.sin(ang) * 0.2,
-              rand(0.4, 0.8),
-              Math.random() < 0.4 ? 2 : 1,
+              rand(0.28, 0.5),
+              Math.random() < 0.35 ? 2 : 1,
               980,
-              0.95
+              0.9
             );
           }
         }
