@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { drawSurferSheet, FRAME_COUNT, FRAME_SIZE } from "@/components/pixel/surferSheet";
-import { HORIZON } from "./WaveCanvas";
+import { HORIZON, PX } from "./WaveCanvas";
 
 /** Nearest-neighbor display scale: 64px frames shown at 128px, crisp. */
 const SCALE = 2;
@@ -32,96 +32,30 @@ const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v
 const DISPLAY = FRAME_SIZE * SCALE;
 const SHEET_W = FRAME_COUNT * DISPLAY;
 
-/** Mini wake canvas — art pixels upscaled for chunky pixel look. */
-const WAKE_PX = 3;
-const WAKE_W = 30; // art pixels wide
-const WAKE_H = 10;
-
-function rnd(seed: number): number {
-  const s = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-  return s - Math.floor(s);
-}
+/** Where the board meets the water, in css px below the transform anchor. */
+const CONTACT_DY = 8;
+/** How far behind the anchor the tail/wake sits, in css px. */
+const TAIL_BACK = 30;
+/** Ceiling on live water-FX particles (trail + spray). */
+const MAX_PARTS = 320;
 
 /**
- * Paints a small scrolling wake beneath the board. `intensity` (0..1, from
- * the board's real speed) and travel direction drive crest height, scroll
- * rate, and foam density.
+ * One water-FX particle, stored in ART-pixel units (viewport px / PX) so the
+ * foam lands on the same chunky grid as the ocean. Foam trail dabs use
+ * grav = 0 and near-zero velocity so they linger on the surface; spray uses
+ * an upward kick + gravity so it arcs and falls back.
  */
-function drawWake(
-  ctx: CanvasRenderingContext2D,
-  t: number,
-  intensity: number,
-  dirX: number
-) {
-  const w = WAKE_W;
-  const h = WAKE_H;
-  const img = ctx.createImageData(w, h);
-  const data = img.data;
-
-  const scroll = t * (2.2 + intensity * 4) * (dirX >= 0 ? 1 : -1);
-  const amp = 0.35 + intensity * 0.9;
-
-  for (let y = 0; y < h; y++) {
-    const rowOff = y * w * 4;
-    const depth = y / (h - 1);
-
-    for (let x = 0; x < w; x++) {
-      const nx = x / w;
-      const wave =
-        Math.sin(nx * 6.2 + scroll + y * 0.55) * amp +
-        Math.sin(nx * 11.5 - scroll * 1.4 + y * 0.3) * amp * 0.45;
-
-      let r = 47;
-      let g = 163;
-      let b = 216;
-      let a = 0;
-
-      // crest band near the top — fades out toward bottom
-      const crestY = 2.2 + wave * 2.2 + Math.sin(scroll * 0.8 + nx * 4) * 0.4;
-      if (y >= crestY - 0.5 && y <= crestY + 2.8) {
-        const crestT = 1 - Math.abs(y - crestY) / 2.5;
-        if (crestT > 0.15) {
-          a = (0.55 + intensity * 0.4) * crestT * (1 - depth * 0.35);
-          if (crestT > 0.7 && intensity > 0.25) {
-            r = 233;
-            g = 251;
-            b = 255;
-          } else if (crestT > 0.45) {
-            r = 95;
-            g = 220;
-            b = 216;
-          } else {
-            r = 47;
-            g = 163;
-            b = 216;
-          }
-        }
-      }
-
-      // foam flecks when carving fast
-      if (intensity > 0.2 && rnd(x * 17.3 + y * 9.1 + Math.floor(t * 8)) < 0.08 * intensity) {
-        r = 255;
-        g = 255;
-        b = 255;
-        a = Math.max(a, 0.5 + intensity * 0.4);
-      }
-
-      // soft dissolve at edges and bottom
-      const edgeFade = Math.min(nx, 1 - nx) * 2.2;
-      const bottomFade = 1 - depth * 0.85;
-      a *= Math.min(1, edgeFade) * bottomFade;
-
-      const i = rowOff + x * 4;
-      data[i] = r;
-      data[i + 1] = g;
-      data[i + 2] = b;
-      data[i + 3] = Math.round(a * 255);
-    }
-  }
-
-  ctx.clearRect(0, 0, w * WAKE_PX, h * WAKE_PX);
-  ctx.putImageData(img, 0, 0);
-}
+type Particle = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  max: number;
+  size: number;
+  grav: number;
+  alpha: number;
+};
 
 /**
  * The cursor-surfer mini-game: a 12-frame procedurally painted sprite sheet
@@ -131,13 +65,17 @@ function drawWake(
  * The board's own screen velocity — not the raw cursor gap — drives the
  * feel: it banks smoothly into turns (mirroring through an edge-on flip),
  * leans into the carve, dips its nose when dropping down the face, and
- * planes a touch higher the faster it rides. A small interactive wake canvas
- * scrolls beneath it, crests growing and foam churning with speed. All
- * smoothing is dt-based, so it feels the same at any refresh rate.
+ * planes a touch higher the faster it rides. All smoothing is dt-based, so it
+ * feels the same at any refresh rate.
+ *
+ * A full-viewport water-FX canvas sits just behind the board and is what
+ * makes it read as riding real water: it lays down a persistent foam wake
+ * trail along the board's path, throws gravity-arced spray off the tail that
+ * grows with speed, and bursts a splash when the board snaps into a turn.
  */
 export default function Surfer() {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const wakeRef = useRef<HTMLCanvasElement>(null);
+  const fxRef = useRef<HTMLCanvasElement>(null);
   const [active, setActive] = useState(false);
   const [sheetUrl, setSheetUrl] = useState<string | null>(null);
 
@@ -148,13 +86,19 @@ export default function Surfer() {
 
     const sheetRaf = requestAnimationFrame(() => setSheetUrl(drawSurferSheet().toDataURL()));
 
-    const wakeCanvas = wakeRef.current;
-    const wakeCtx = wakeCanvas?.getContext("2d");
-    if (wakeCanvas && wakeCtx) {
-      wakeCanvas.width = WAKE_W;
-      wakeCanvas.height = WAKE_H;
-      wakeCtx.imageSmoothingEnabled = false;
-    }
+    const fxCanvas = fxRef.current;
+    const fx = fxCanvas?.getContext("2d") ?? null;
+    let fxW = 0;
+    let fxH = 0;
+    const sizeFx = () => {
+      if (!fxCanvas) return;
+      fxW = Math.ceil(window.innerWidth / PX);
+      fxH = Math.ceil(window.innerHeight / PX);
+      fxCanvas.width = fxW;
+      fxCanvas.height = fxH;
+      if (fx) fx.imageSmoothingEnabled = false;
+    };
+    sizeFx();
 
     const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const pos = { x: mouse.x, y: mouse.y };
@@ -164,10 +108,39 @@ export default function Surfer() {
     let velY = 0;
     let facing = 1; // continuous −1..1; lerps so the flip banks, not snaps
     let faceTarget = 1;
+    let lastFaceTarget = 1;
     let lean = 0; // smoothed carve tilt, degrees
     let lift = 0; // smoothed planing lift, px
-    let wakeT = 0;
     let lastNow = performance.now();
+
+    // water-FX particles, in art-pixel space
+    const parts: Particle[] = [];
+    /** Spawn a particle from css-px position/velocity (converted to art px). */
+    const emit = (
+      cx: number,
+      cy: number,
+      cvx: number,
+      cvy: number,
+      life: number,
+      size: number,
+      cgrav: number,
+      alpha: number
+    ) => {
+      if (parts.length >= MAX_PARTS) parts.shift();
+      parts.push({
+        x: cx / PX,
+        y: cy / PX,
+        vx: cvx / PX,
+        vy: cvy / PX,
+        life,
+        max: life,
+        size,
+        grav: cgrav / PX,
+        alpha,
+      });
+    };
+
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
     const onMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
@@ -183,7 +156,6 @@ export default function Surfer() {
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - lastNow) / 1000);
       lastNow = now;
-      wakeT += dt;
 
       const el = wrapRef.current;
       if (el && seen) {
@@ -227,63 +199,158 @@ export default function Surfer() {
           `translate(${Math.round(pos.x)}px, ${Math.round(pos.y + lift)}px) ` +
           `translate(-50%, -66%) rotate(${lean.toFixed(2)}deg) scaleX(${facing.toFixed(3)})`;
 
-        if (wakeCtx) {
-          const intensity = Math.min(1, speed / FULL_SPEED);
-          drawWake(wakeCtx, wakeT, intensity, facing < 0 ? 1 : -1);
+        /* ---- feed the water FX from the board's motion ---- */
+        const inv = 1 / Math.max(speed, 1);
+        const dirX = velX * inv; // unit travel direction
+        const dirY = velY * inv;
+        const contactY = pos.y + CONTACT_DY;
+        const tailX = pos.x - dirX * TAIL_BACK;
+        const tailY = contactY - dirY * TAIL_BACK * 0.35;
+        const perpX = -dirY; // perpendicular to travel, for the V-wake
+        const perpY = dirX;
+
+        if (speed > 45) {
+          // persistent foam dab on the path → a lingering wake trail
+          emit(
+            tailX + rand(-2, 2),
+            tailY + rand(-1.5, 1.5),
+            rand(-8, 8),
+            rand(-6, 4),
+            rand(0.85, 1.4),
+            Math.random() < 0.3 ? 2 : 1,
+            0,
+            0.7
+          );
+          // two diverging crests spreading off the tail (the V-wake)
+          if (speed > 150) {
+            const spread = 40 + Math.min(speed * 0.05, 70);
+            for (const side of [1, -1]) {
+              emit(
+                tailX,
+                tailY,
+                perpX * side * spread - dirX * 20,
+                perpY * side * spread - dirY * 20,
+                rand(0.5, 0.85),
+                1,
+                60,
+                0.6
+              );
+            }
+          }
+        }
+
+        // carve spray: kicked back and up off the tail, arcs under gravity;
+        // more of it, thrown harder, the faster the board is driving
+        const sprayI = clamp((speed - 260) / 1000, 0, 1);
+        const nSpray = Math.floor(sprayI * 4) + (Math.random() < sprayI ? 1 : 0);
+        for (let s = 0; s < nSpray; s++) {
+          const back = rand(120, 300) * sprayI + 60;
+          emit(
+            tailX + rand(-4, 4),
+            tailY + rand(-3, 3),
+            -dirX * back + rand(-90, 90),
+            -dirY * back - rand(150, 300), // upward kick
+            rand(0.3, 0.65),
+            Math.random() < 0.25 ? 2 : 1,
+            980,
+            0.9
+          );
+        }
+
+        // splash burst the instant the board commits to a new turn direction
+        if (faceTarget !== lastFaceTarget && speed > 240) {
+          const side = faceTarget < lastFaceTarget ? 1 : -1;
+          for (let s = 0; s < 12; s++) {
+            const ang = rand(-0.5, 0.5);
+            const kx = perpX * side * rand(120, 300) - dirX * rand(40, 120);
+            const ky = perpY * side * rand(120, 300) - dirY * rand(40, 120) - rand(180, 320);
+            emit(
+              tailX,
+              tailY,
+              kx * Math.cos(ang),
+              ky - Math.abs(kx) * Math.sin(ang) * 0.2,
+              rand(0.4, 0.8),
+              Math.random() < 0.4 ? 2 : 1,
+              980,
+              0.95
+            );
+          }
+        }
+        lastFaceTarget = faceTarget;
+      }
+
+      /* ---- simulate + paint the water FX ---- */
+      if (fx) {
+        fx.clearRect(0, 0, fxW, fxH);
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const p = parts[i];
+          p.life -= dt;
+          if (p.life <= 0) {
+            parts.splice(i, 1);
+            continue;
+          }
+          p.vy += p.grav * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          const f = p.life / p.max;
+          // foam whitens when fresh, cools to aqua as it settles/dissolves
+          const col = f > 0.62 ? "255,255,255" : f > 0.32 ? "191,239,250" : "124,232,236";
+          fx.fillStyle = `rgba(${col},${(Math.min(1, f * 1.5) * p.alpha).toFixed(3)})`;
+          fx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
         }
       }
+
       raf = requestAnimationFrame(loop);
     };
 
     window.addEventListener("mousemove", onMove);
+    window.addEventListener("resize", sizeFx);
     raf = requestAnimationFrame(loop);
 
     return () => {
       window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("resize", sizeFx);
       cancelAnimationFrame(raf);
       cancelAnimationFrame(sheetRaf);
     };
   }, []);
 
-  const wakeDisplayW = WAKE_W * WAKE_PX;
-  const wakeDisplayH = WAKE_H * WAKE_PX;
-
   return (
-    <div
-      ref={wrapRef}
-      aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-50 will-change-transform"
-      style={{ visibility: active ? "visible" : "hidden" }}
-    >
-      <style>{`
-        @keyframes surf-cycle {
-          from { background-position: 0 0; }
-          to { background-position: -${SHEET_W}px 0; }
-        }
-      `}</style>
-      {sheetUrl && (
-        <div
-          style={{
-            width: DISPLAY,
-            height: DISPLAY,
-            backgroundImage: `url(${sheetUrl})`,
-            backgroundSize: `${SHEET_W}px ${DISPLAY}px`,
-            imageRendering: "pixelated",
-            animation: `surf-cycle ${CYCLE_S}s steps(${FRAME_COUNT}) infinite`,
-          }}
-        />
-      )}
+    <>
+      {/* water-FX layer: sits behind the board, above the ocean */}
       <canvas
-        ref={wakeRef}
-        className="absolute left-1/2 -translate-x-1/2"
-        style={{
-          top: DISPLAY * 0.62,
-          width: wakeDisplayW,
-          height: wakeDisplayH,
-          imageRendering: "pixelated",
-        }}
+        ref={fxRef}
         aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-40 h-full w-full"
+        style={{ imageRendering: "pixelated", visibility: active ? "visible" : "hidden" }}
       />
-    </div>
+
+      {/* the rider */}
+      <div
+        ref={wrapRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed left-0 top-0 z-50 will-change-transform"
+        style={{ visibility: active ? "visible" : "hidden" }}
+      >
+        <style>{`
+          @keyframes surf-cycle {
+            from { background-position: 0 0; }
+            to { background-position: -${SHEET_W}px 0; }
+          }
+        `}</style>
+        {sheetUrl && (
+          <div
+            style={{
+              width: DISPLAY,
+              height: DISPLAY,
+              backgroundImage: `url(${sheetUrl})`,
+              backgroundSize: `${SHEET_W}px ${DISPLAY}px`,
+              imageRendering: "pixelated",
+              animation: `surf-cycle ${CYCLE_S}s steps(${FRAME_COUNT}) infinite`,
+            }}
+          />
+        )}
+      </div>
+    </>
   );
 }

@@ -17,7 +17,7 @@ import { nightness } from "./dayNight";
  *   hash-seeded twinkling starfield
  */
 
-const PX = 5; // css pixels per art pixel
+export const PX = 5; // css pixels per art pixel
 /** Fraction of viewport height where sky meets sea — shared with Surfer so the rider stays in the water. */
 export const HORIZON = 0.42;
 
