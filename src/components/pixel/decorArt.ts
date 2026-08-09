@@ -1,234 +1,24 @@
 /**
- * Procedural painters for the ocean scene's decorative easter-egg sprites:
- * sea life (shark fin, leaping dolphin, wandering sailboat) and sky life
- * (clouds, gulls, hot air balloon, banner plane, sun, moon).
+ * Procedural painters for the ocean scene's decorative sky sprites:
+ * clouds, hot air balloon, banner plane, sun and moon.
  *
  * Same pipeline as the islands (islandArt.ts): vector shapes painted at 4x
  * supersample, downscaled onto an art-pixel grid, displayed with
  * nearest-neighbor upscaling for the chunky pixel look.
  *
- * Directional sprites (boat, fin, dolphin, plane, gull) all face RIGHT;
- * flip with scaleX(-1) to travel left.
+ * The banner plane faces RIGHT; flip with scaleX(-1) to travel left.
  */
 
 import { dot, poly, stroke, speckle, rnd, rasterize, type Ctx } from "./islandArt";
 
 export type DecorKind =
-  | "sailboat"
-  | "sharkFin"
-  | "dolphin"
   | "balloon"
   | "plane"
   | "sun"
   | "moon"
-  | "gull"
   | "cloud0"
   | "cloud1"
   | "cloud2";
-
-/* ------------------------------ sea life ------------------------------ */
-
-/** Little sloop that wanders the horizon. Bow to the right, waterline y≈54. */
-function drawSailboat(g: Ctx) {
-  // shallow-water glow under the hull
-  g.globalAlpha = 0.3;
-  g.fillStyle = "#7ce8ec";
-  g.beginPath();
-  g.ellipse(36, 55.5, 27, 3.2, 0, 0, Math.PI * 2);
-  g.fill();
-  g.globalAlpha = 1;
-
-  // forestay + backstay rigging (behind everything)
-  stroke(g, [[34, 7], [62, 44.5]], 0.4, "#4c3a26", 0.6);
-  stroke(g, [[34, 7], [11, 44.5]], 0.4, "#4c3a26", 0.5);
-
-  // mast + boom
-  g.fillStyle = "#6b4226";
-  g.fillRect(33.2, 6, 1.6, 40);
-  stroke(g, [[34, 42.5], [56, 44]], 1.1, "#5c3a1e");
-
-  // jib (forward sail) — slightly darker cream, behind the main
-  g.fillStyle = "#eee2c2";
-  g.beginPath();
-  g.moveTo(35, 10);
-  g.quadraticCurveTo(52, 26, 60, 43.5);
-  g.quadraticCurveTo(48, 45, 37, 43.5);
-  g.closePath();
-  g.fill();
-  stroke(g, [[44, 26], [46, 42]], 0.5, "#d2c294", 0.7);
-
-  // mainsail — billowing cream with seams and a patch
-  const sail = g.createLinearGradient(35, 0, 58, 0);
-  sail.addColorStop(0, "#fbf4e2");
-  sail.addColorStop(1, "#e2d4ac");
-  g.fillStyle = sail;
-  g.beginPath();
-  g.moveTo(35, 8.5);
-  g.quadraticCurveTo(38, 26, 35.5, 42.5);
-  g.quadraticCurveTo(46, 44.6, 55.5, 43.4);
-  g.quadraticCurveTo(50, 24, 35, 8.5);
-  g.closePath();
-  g.fill();
-  stroke(g, [[37.5, 17], [40.5, 17.6]], 0.4, "#cdbc8e", 0.7);
-  stroke(g, [[37, 25], [45.5, 26.4]], 0.4, "#cdbc8e", 0.7);
-  stroke(g, [[36.5, 33.5], [50.5, 35.2]], 0.4, "#cdbc8e", 0.7);
-  g.fillStyle = "#dccca0";
-  g.fillRect(41, 29, 2.4, 2.4);
-  // leech shade
-  stroke(g, [[50, 25], [54, 36], [55, 43]], 1, "#cbb884", 0.5);
-
-  // pennant streaming aft from the masthead
-  poly(g, [[33.4, 5.2], [26, 6.8], [33.4, 8.4]], "#ff5f35");
-
-  // hull — planked, warm red-brown, bow to the right
-  const hull = g.createLinearGradient(0, 45, 0, 56);
-  hull.addColorStop(0, "#c65a32");
-  hull.addColorStop(0.55, "#964122");
-  hull.addColorStop(1, "#5c2814");
-  g.fillStyle = hull;
-  g.beginPath();
-  g.moveTo(9, 45);
-  g.lineTo(63, 45);
-  g.lineTo(54, 55.5);
-  g.quadraticCurveTo(36, 57.5, 19, 55.5);
-  g.closePath();
-  g.fill();
-  // gunwale stripe + plank seams
-  stroke(g, [[9.5, 46.3], [62, 46.3]], 1, "#f6ead0", 0.95);
-  stroke(g, [[12, 49.8], [59, 49.8]], 0.5, "#5c2814", 0.55);
-  stroke(g, [[15, 52.8], [56, 52.8]], 0.5, "#5c2814", 0.5);
-  // brass portholes
-  [24, 34, 44].forEach((px) => {
-    dot(g, px, 50.6, 1.15, "#caa04a");
-    dot(g, px, 50.6, 0.6, "#1d3557");
-  });
-  // tiller + tiny lantern at the stern
-  stroke(g, [[10.5, 44.8], [7.5, 42.5]], 0.7, "#5c3a1e");
-  dot(g, 7.3, 41.8, 0.8, "#ffd23e");
-
-  // bow spray + stern wake
-  dot(g, 60.5, 54.5, 1, "#ffffff", 0.9);
-  dot(g, 63.5, 55.5, 0.7, "#e9fbff", 0.8);
-  dot(g, 14, 55.8, 0.9, "#e9fbff", 0.8);
-  dot(g, 9.5, 56.4, 0.7, "#bfeffa", 0.7);
-  stroke(g, [[6, 56.2], [16, 56.8]], 0.6, "#e9fbff", 0.5);
-}
-
-/** Dorsal fin cutting the water, moving right. Waterline y≈26. */
-function drawSharkFin(g: Ctx) {
-  // tail-fin tip trailing behind, just breaking the surface
-  poly(g, [[1, 20.5], [6.5, 26.5], [0, 26.5]], "#2c4458", 0.95);
-  stroke(g, [[1.4, 21.5], [2.6, 24.5]], 0.5, "#4a6a84", 0.7);
-
-  // dorsal fin: long convex leading edge (right), raked tip pointing back
-  const fin = g.createLinearGradient(0, 3, 0, 27);
-  fin.addColorStop(0, "#5a7a94");
-  fin.addColorStop(0.65, "#3a566e");
-  fin.addColorStop(1, "#26404f");
-  g.fillStyle = fin;
-  g.beginPath();
-  g.moveTo(10, 27.5);
-  g.lineTo(33, 27.5);
-  g.quadraticCurveTo(29, 14, 19.5, 4);
-  g.quadraticCurveTo(15.5, 9.5, 13.5, 16);
-  g.quadraticCurveTo(11.8, 21.5, 10, 27.5);
-  g.closePath();
-  g.fill();
-  // wet sheen down the leading edge + shaded trailing edge
-  stroke(g, [[31.5, 25], [26.5, 14.5], [20.5, 6]], 0.9, "#8fb2c8", 0.75);
-  stroke(g, [[18.5, 6.5], [14.5, 15.5], [11.5, 24.5]], 0.8, "#1a2c3c", 0.6);
-  // battle scar nicks
-  stroke(g, [[22, 12], [24.5, 12.6]], 0.5, "#20323e", 0.8);
-  stroke(g, [[19, 18], [22, 18.8]], 0.5, "#20323e", 0.7);
-  speckle(g, 20, 20, 8, 5, "#6d8ca4", 10, 0.4, 3.3);
-
-  // waterline churn + V-wake trailing off behind
-  stroke(g, [[9, 27], [34, 27]], 1.1, "#ffffff", 0.9);
-  stroke(g, [[6, 28.4], [36, 28.2]], 0.7, "#bfeffa", 0.7);
-  stroke(g, [[10, 26.2], [0.5, 23.8]], 0.7, "#e9fbff", 0.75);
-  stroke(g, [[10, 28.8], [0.5, 31]], 0.7, "#e9fbff", 0.7);
-  dot(g, 34.5, 26, 0.8, "#ffffff", 0.9); // bow ripple at the leading base
-  dot(g, 37, 27.4, 0.6, "#bfeffa", 0.8);
-  dot(g, 3, 22.6, 0.5, "#bfeffa", 0.7);
-  dot(g, 2, 32, 0.5, "#bfeffa", 0.65);
-}
-
-/** Dolphin mid-leap, arcing to the right, trailing droplets. */
-function drawDolphin(g: Ctx) {
-  // body — smooth arc, rostrum right, tail joint left
-  const body = g.createLinearGradient(0, 4, 0, 34);
-  body.addColorStop(0, "#6c9cc4");
-  body.addColorStop(1, "#3f6a94");
-  g.fillStyle = body;
-  g.beginPath();
-  g.moveTo(57, 25); // nose tip
-  g.bezierCurveTo(52, 10, 34, 4, 22, 11);
-  g.bezierCurveTo(15, 15, 10, 22, 7, 28);
-  g.lineTo(11, 30.5);
-  g.bezierCurveTo(20, 26.5, 30, 28, 40, 31);
-  g.quadraticCurveTo(51, 32.5, 57, 25);
-  g.closePath();
-  g.fill();
-
-  // pale belly along the underside
-  g.fillStyle = "#dceaf4";
-  g.beginPath();
-  g.moveTo(54, 27.5);
-  g.quadraticCurveTo(44, 31.5, 32, 29.2);
-  g.quadraticCurveTo(22, 27.5, 13, 29.8);
-  g.quadraticCurveTo(24, 30.5, 36, 31.6);
-  g.quadraticCurveTo(48, 32, 54, 27.5);
-  g.closePath();
-  g.fill();
-
-  // dorsal fin curving back
-  g.fillStyle = "#35597c";
-  g.beginPath();
-  g.moveTo(30, 7.5);
-  g.quadraticCurveTo(33, 0.5, 38.5, 1.5);
-  g.quadraticCurveTo(37, 4.5, 37.5, 7.2);
-  g.closePath();
-  g.fill();
-
-  // pectoral fin
-  g.fillStyle = "#2f5174";
-  g.beginPath();
-  g.moveTo(40, 28.5);
-  g.quadraticCurveTo(45, 33.5, 43.5, 37.5);
-  g.quadraticCurveTo(37.5, 33.5, 36, 29.6);
-  g.closePath();
-  g.fill();
-
-  // tail flukes
-  g.fillStyle = "#3f6a94";
-  g.beginPath();
-  g.moveTo(9, 27);
-  g.quadraticCurveTo(3, 21.5, 1, 23);
-  g.quadraticCurveTo(4.5, 27, 4, 30);
-  g.quadraticCurveTo(1.5, 34.5, 3.5, 36);
-  g.quadraticCurveTo(8, 33.5, 12, 30.5);
-  g.closePath();
-  g.fill();
-  stroke(g, [[4.5, 24.5], [6.5, 28.5]], 0.5, "#2f5174", 0.7);
-
-  // rostrum crease + smile
-  stroke(g, [[57, 25.2], [50, 27.6]], 0.6, "#243c56", 0.65);
-  // eye with glint
-  dot(g, 48.5, 21.5, 1.2, "#15243c");
-  dot(g, 49, 21, 0.4, "#ffffff", 0.95);
-  // blowhole + back sheen
-  stroke(g, [[36.5, 6.2], [38, 6.4]], 0.6, "#243c56", 0.7);
-  stroke(g, [[26, 10], [40, 6.5], [50, 12]], 1, "#a8cce8", 0.65);
-  speckle(g, 34, 16, 14, 6, "#5a88b4", 12, 0.35, 7.7);
-
-  // droplets flung off the arc
-  dot(g, 5, 17, 0.7, "#ffffff", 0.85);
-  dot(g, 2.5, 27, 0.6, "#bfeffa", 0.8);
-  dot(g, 7, 38, 0.7, "#e9fbff", 0.8);
-  dot(g, 14, 39.5, 0.55, "#bfeffa", 0.7);
-  dot(g, 12, 8, 0.55, "#e9fbff", 0.7);
-  dot(g, 52, 33, 0.6, "#e9fbff", 0.75);
-}
 
 /* ------------------------------ sky life ------------------------------ */
 
@@ -501,47 +291,6 @@ function drawMoon(g: Ctx) {
   dot(g, 5, 30, 0.7, "#dfe9f4", 0.85);
 }
 
-/** Gliding gull, beak to the right. */
-function drawGull(g: Ctx) {
-  // far wing raised behind
-  g.fillStyle = "#d4dde4";
-  g.beginPath();
-  g.moveTo(13, 9.5);
-  g.quadraticCurveTo(8, 3.5, 2.5, 3);
-  g.quadraticCurveTo(7, 7, 11.5, 11);
-  g.closePath();
-  g.fill();
-  poly(g, [[4.5, 3.6], [2.5, 3], [4, 5.2]], "#2b3a44"); // dark tip
-
-  // body
-  const body = g.createLinearGradient(0, 8, 0, 15);
-  body.addColorStop(0, "#ffffff");
-  body.addColorStop(1, "#dbe6ec");
-  g.fillStyle = body;
-  g.beginPath();
-  g.ellipse(15, 11.5, 5.5, 2.8, -0.12, 0, Math.PI * 2);
-  g.fill();
-  // tail feathers
-  poly(g, [[10.5, 11], [6.5, 12.8], [10.8, 13.2]], "#e8eef2");
-  stroke(g, [[7.2, 12.6], [9.5, 12.2]], 0.4, "#8fa2ae", 0.8);
-
-  // near wing sweeping down-forward
-  g.fillStyle = "#f2f6f8";
-  g.beginPath();
-  g.moveTo(13.5, 11);
-  g.quadraticCurveTo(19, 13.5, 26, 10.5);
-  g.quadraticCurveTo(20.5, 16.5, 14, 14);
-  g.closePath();
-  g.fill();
-  poly(g, [[24.4, 10.8], [26, 10.5], [24.2, 12.4]], "#2b3a44");
-  stroke(g, [[15.5, 12.6], [21, 12.8]], 0.4, "#b8c8d2", 0.8);
-
-  // head + beak + eye
-  dot(g, 19.8, 9.2, 2.1, "#ffffff");
-  poly(g, [[21.6, 8.8], [24.4, 9.6], [21.6, 10.2]], "#f2b134");
-  dot(g, 20.4, 8.7, 0.45, "#1d232e");
-}
-
 /** Fluffy cumulus cloud; seed varies the puff layout per variant. */
 function cloudPainter(seed: number, w: number, h: number) {
   return (g: Ctx) => {
@@ -592,14 +341,10 @@ function cloudPainter(seed: number, w: number, h: number) {
 type Spec = { size: [number, number]; painter: (g: Ctx) => void };
 
 const SPECS: Record<DecorKind, Spec> = {
-  sailboat: { size: [72, 60], painter: drawSailboat },
-  sharkFin: { size: [40, 34], painter: drawSharkFin },
-  dolphin: { size: [60, 42], painter: drawDolphin },
   balloon: { size: [40, 54], painter: drawBalloon },
   plane: { size: [94, 28], painter: drawPlane },
   sun: { size: [40, 40], painter: drawSun },
   moon: { size: [40, 40], painter: drawMoon },
-  gull: { size: [27, 16], painter: drawGull },
   cloud0: { size: [88, 34], painter: cloudPainter(1.7, 88, 34) },
   cloud1: { size: [72, 28], painter: cloudPainter(6.2, 72, 28) },
   cloud2: { size: [56, 24], painter: cloudPainter(11.9, 56, 24) },

@@ -188,18 +188,6 @@ body {
   50% { transform: scale(1.06); opacity: 1; }
 }
 
-/* sailboat tacking across and back; flip swaps the bow at the far mark */
-@keyframes sail-x {
-  0% { transform: translateX(2vw); }
-  50% { transform: translateX(76vw); }
-  100% { transform: translateX(2vw); }
-}
-
-@keyframes sail-flip {
-  0%, 49.99% { transform: scaleX(1); }
-  50%, 100% { transform: scaleX(-1); }
-}
-
 /* banner plane flyby */
 @keyframes fly-across {
   0% { transform: translateX(calc(-100% - 4vw)); opacity: 0; }

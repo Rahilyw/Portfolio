@@ -43,22 +43,3 @@ export function PixelLink({
     </Link>
   );
 }
-
-export function PixelButton({
-  children,
-  className,
-  variant = "primary",
-  type = "button",
-  onClick,
-  "aria-label": ariaLabel,
-}: SharedProps & {
-  type?: "button" | "submit";
-  onClick?: () => void;
-  "aria-label"?: string;
-}) {
-  return (
-    <button type={type} onClick={onClick} aria-label={ariaLabel} className={classes(variant, className)}>
-      {children}
-    </button>
-  );
-}

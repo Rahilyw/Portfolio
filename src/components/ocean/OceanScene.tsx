@@ -4,7 +4,6 @@ import { SPRITE_SIZES, DISPLAY_SCALE } from "@/components/pixel/islandArt";
 import WaveCanvas from "./WaveCanvas";
 import Surfer from "./Surfer";
 import IslandSprite from "./IslandSprite";
-import OceanLife from "./OceanLife";
 import SkyLife from "./SkyLife";
 import NightDim from "./NightDim";
 import SoundToggle from "@/components/SoundToggle";
@@ -73,8 +72,6 @@ export default function OceanScene() {
       {/* ocean band with islands + sea life, dimmed together after dark */}
       <div className="absolute inset-x-0 bottom-0 z-10 h-[58%]">
         <NightDim className="absolute inset-0">
-          <OceanLife />
-
           {/* desktop: islands scattered across the map at hand-placed coordinates */}
           {islands.map((island) => (
             <Link
