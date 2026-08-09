@@ -38,7 +38,7 @@ all pages share. Solid panels float on top of it.
 - `.pixel-panel` / `.pixel-panel-light` (globals.css) — square corners,
   4px ink border, hard `6px 6px 0` ink shadow; dark ocean fill or cream.
   Never nest panels.
-- `.pixel-btn` + `PixelLink`/`PixelButton` (`src/components/game/PixelButton.tsx`)
+- `.pixel-btn` + `PixelLink` (`src/components/game/PixelButton.tsx`)
   — chunky arcade press: hover lifts (−1px, bigger shadow), active slams
   (+3px, shadow collapses), 80ms steps() transitions.
 - `StatBar` (`game/StatBar.tsx`) — 12 discrete cells, staggered `.stat-cell`
@@ -73,5 +73,5 @@ all pages share. Solid panels float on top of it.
 
 - No rounded cards, soft shadows, gradient text, glassmorphism.
 - No magazine fonts or tokens (see retired lists above).
-- New decorative art is pixel art (crispEdges SVG rects, `PixelSprite`,
+- New decorative art is pixel art (rasterized canvas sprites via
   `islandArt`, `decorArt`) — no smooth-vector illustration.

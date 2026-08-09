@@ -14,8 +14,8 @@ surf magazine, *Surf & Code Quarterly*.
   animations are drawn at runtime on `<canvas>` (no sprite image assets), then
   upscaled nearest-neighbor for the chunky retro look.
 - **Living scene** — day/night cycle synced to real local time, clouds, a
-  banner plane, sea life, and a surfer that follows the cursor (desktop,
-  motion-safe only).
+  hot air balloon, a banner plane, and a surfer that follows the cursor
+  (desktop, motion-safe only).
 - **Synthesized ocean audio** — the wave sound is generated with the Web Audio
   API (filtered noise + LFO swell), no audio files shipped.
 - **Accessible by default** — honors `prefers-reduced-motion`, keyboard
