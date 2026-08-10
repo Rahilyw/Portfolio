@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { site } from "@/data/content";
 import WaveBackground from "@/components/game/WaveBackground";
@@ -10,7 +11,7 @@ import BottleReveal from "@/components/BottleReveal";
 export const metadata: Metadata = {
   title: "About Me — Rahil Wijeyesekera",
   description:
-    "Third-year CS student at UVic, Technical Co-founder, Surf Club Executive, and builder of things that ship.",
+    "Third-year CS at UVic, technical co-founder at Serendira, surf club regular. Stats, snapshots, and the spawn point.",
 };
 
 const attributes = [
@@ -25,10 +26,39 @@ const attributes = [
 const vitals = [
   { label: "Class", value: "Builder / Surfer" },
   { label: "Level", value: "CS Year 3" },
-  { label: "Guild", value: "UVic Surf Club Exec" },
-  { label: "Sport", value: "High-level rugby" },
+  { label: "Guild", value: "UVic Surf Club · ECSS" },
+  { label: "Sport", value: "Rugby" },
   { label: "Home Base", value: "Victoria, BC" },
   { label: "Surf Map", value: "Tofino · Sri Lanka · Singapore" },
+];
+
+/* Field journal: taped-down snapshots. Tilt + tape vary per snap so the
+   grid reads as hand-placed, not generated. */
+const snaps = [
+  {
+    src: "/images/rahil-with-surfboard.jpeg",
+    alt: "Rahil on the beach in Tofino, longboard under one arm, horns up",
+    label: "Tofino, BC",
+    note: "boards out",
+    tilt: "-2deg",
+    aspect: "aspect-[4/5]",
+  },
+  {
+    src: "/images/rahil-surf-shop.jpeg",
+    alt: "Rahil grinning between two full racks of surfboards in a shop",
+    label: "Board Shop",
+    note: "just browsing",
+    tilt: "1.5deg",
+    aspect: "aspect-[4/5]",
+  },
+  {
+    src: "/images/rahil-ocean.jpeg",
+    alt: "Rahil out on the water",
+    label: "Home Waters",
+    note: "victoria, bc",
+    tilt: "-1deg",
+    aspect: "aspect-[4/5]",
+  },
 ];
 
 export default function AboutMePage() {
@@ -58,19 +88,31 @@ export default function AboutMePage() {
 
         {/* Character header */}
         <header className="mx-auto grid w-full max-w-5xl gap-8 px-4 py-10 md:grid-cols-[220px_1fr] md:items-end sm:px-6">
-          <div className="pixel-panel float-panel mx-auto w-full max-w-[220px] overflow-hidden p-2">
-            <div className="relative aspect-[3/4] border-2 border-ink bg-navy">
-              <Image
-                src="/images/rahil-portrait.jpeg"
-                alt="Rahil Wijeyesekera"
-                fill
-                sizes="220px"
-                priority
-                className="object-cover object-top"
-                style={{ imageRendering: "auto" }}
-              />
+          <div className="relative mx-auto w-full max-w-[220px]">
+            <div className="pixel-panel float-panel overflow-hidden p-2">
+              <div className="relative aspect-[3/4] border-2 border-ink bg-navy">
+                <Image
+                  src="/images/rahil-portrait.jpeg"
+                  alt="Rahil Wijeyesekera"
+                  fill
+                  sizes="220px"
+                  priority
+                  className="object-cover object-top"
+                />
+              </div>
+              <p className="mt-2 text-center font-press text-[8px] text-mustard">
+                Portrait Unlocked
+              </p>
             </div>
-            <p className="mt-2 text-center font-press text-[8px] text-mustard">Portrait Unlocked</p>
+            {/* souvenir starfish pinned over the card corner */}
+            <Image
+              src="/images/starfish.png"
+              alt=""
+              width={72}
+              height={73}
+              aria-hidden="true"
+              className="sticker absolute -right-6 -top-5 rotate-12"
+            />
           </div>
 
           <div>
@@ -87,12 +129,13 @@ export default function AboutMePage() {
             </h1>
             <p className="mt-3 inline-flex items-center gap-2 border-2 border-ink bg-sunset px-3 py-1 font-press text-[9px] uppercase text-foam">
               <Surfboard size={12} />
-              The Builder Who Ships
+              Ships early · Wipes out often
             </p>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-foam/90 sm:text-base">
-              Third-year Computer Science at UVic. Technical Co-founder. Surf Club Executive.
-              Rugby veteran. He does not study products - he builds them and paddles them into
-              the wild.
+              Third-year CS at UVic and technical co-founder at Serendira. I spent a semester
+              at NUS in Singapore, interned in Sri Lanka, and learned to surf in water cold
+              enough that renting the thick wetsuit stops feeling optional. I like building
+              things more than talking about building things, so here are the stats.
             </p>
           </div>
         </header>
@@ -108,14 +151,14 @@ export default function AboutMePage() {
                 className="font-press whitespace-nowrap text-[9px] tracking-[0.18em] text-mustard"
               >
                 {Array.from({ length: 6 })
-                  .map(() => "CHARACTER BUILD · ORIGIN STORY · STATS ALLOCATED · ")
+                  .map(() => "CHARACTER BUILD · FIELD JOURNAL · SPAWN POINT · ")
                   .join("")}
               </span>
             ))}
           </div>
         </div>
 
-        <main className="mx-auto w-full max-w-5xl flex-1 space-y-8 px-4 py-10 sm:px-6">
+        <main className="mx-auto w-full max-w-5xl flex-1 space-y-10 px-4 py-10 sm:px-6">
           {/* Stats + Vitals */}
           <div className="grid gap-6 lg:grid-cols-2">
             <section className="pixel-panel p-5">
@@ -133,7 +176,7 @@ export default function AboutMePage() {
                 ))}
               </div>
               <p className="mt-4 font-press text-[8px] leading-relaxed text-foam/55">
-                Points invested via shipping real projects, not reading about waves.
+                Self-reported. Recalibrated after every wipeout.
               </p>
             </section>
 
@@ -155,7 +198,7 @@ export default function AboutMePage() {
               <div className="relative mt-5 aspect-[16/10] border-2 border-ink">
                 <Image
                   src="/images/rahil-surf-beach.jpeg"
-                  alt="Surf session"
+                  alt="Surf session on a Vancouver Island beach"
                   fill
                   sizes="400px"
                   className="object-cover"
@@ -164,62 +207,190 @@ export default function AboutMePage() {
             </section>
           </div>
 
-          {/* Origin story */}
+          {/* Spawn point: Sri Lanka dossier */}
+          <section className="relative">
+            <h2 className="mb-4 font-press text-[11px] uppercase text-mustard">
+              Spawn Point · Island of Origin
+            </h2>
+            <div className="grid gap-6 md:grid-cols-[minmax(0,320px)_1fr] md:items-start">
+              <div className="pixel-panel-light relative p-3">
+                <Image
+                  src="/images/sri-lanka-map.jpg"
+                  alt="Vintage survey map of Ceylon"
+                  width={500}
+                  height={743}
+                  sizes="(min-width: 768px) 320px, 90vw"
+                  className="w-full border-2 border-ink"
+                />
+                {/* postage pinned over the map edge */}
+                <div className="absolute -right-4 top-6 w-[88px] rotate-6 border-2 border-ink bg-paper p-0.5 shadow-[4px_4px_0_var(--ink)] sm:w-[104px]">
+                  <Image
+                    src="/images/lighthouse-stamp.jpg"
+                    alt="Sri Lankan 75-cent stamp of the Great Basses lighthouse"
+                    width={736}
+                    height={1046}
+                    className="w-full"
+                  />
+                  <span className="tape -left-3 -top-2 h-4 w-10 -rotate-45" aria-hidden="true" />
+                </div>
+                <div className="absolute -right-2 top-44 w-[72px] -rotate-6 border-2 border-ink bg-paper p-0.5 shadow-[4px_4px_0_var(--ink)] sm:w-[84px]">
+                  <Image
+                    src="/images/sri-lanka-stamp.jpg"
+                    alt="Ceylon 10-cent stamp of king coconuts"
+                    width={354}
+                    height={400}
+                    className="w-full"
+                  />
+                  <span className="tape -right-3 -top-2 h-4 w-10 rotate-45" aria-hidden="true" />
+                </div>
+                <p className="mt-2 text-center font-press text-[8px] uppercase text-navy/70">
+                  Ceylon · Survey Map
+                </p>
+              </div>
+
+              <div className="pixel-panel relative p-5 sm:p-6">
+                <p className="mb-2 font-press text-[9px] text-sunset">Heritage Log</p>
+                <p className="max-w-prose text-sm leading-relaxed text-foam/90 sm:text-base">
+                  Wijeyesekera is a Sri Lankan name, and the island keeps pulling me back.
+                  Summer 2024 I was there interning at Innovation Quotient, turning market
+                  research into growth plans for bank boards. The surfing was strictly
+                  extracurricular. The water is thirty degrees warmer than home and nobody
+                  brags about it, which I respect.
+                </p>
+                <p className="mt-3 max-w-prose text-sm leading-relaxed text-foam/90 sm:text-base">
+                  The lighthouse on the 75-cent stamp is Great Basses, a real one off the
+                  south coast. The other stamp is king coconuts. Both grow on you.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {["Innovation Quotient · 2024", "NUS Exchange · 2025", "Tofino runs · ongoing"].map(
+                    (chip) => (
+                      <span
+                        key={chip}
+                        className="border-2 border-ink bg-navy px-2 py-1 font-press text-[8px] uppercase text-foam"
+                      >
+                        {chip}
+                      </span>
+                    )
+                  )}
+                </div>
+                {/* souvenirs escaping the panel */}
+                <Image
+                  src="/images/coconut.png"
+                  alt=""
+                  width={80}
+                  height={102}
+                  aria-hidden="true"
+                  className="sticker absolute -bottom-6 -right-4 -rotate-6"
+                />
+                <Image
+                  src="/images/fish.png"
+                  alt=""
+                  width={110}
+                  height={35}
+                  aria-hidden="true"
+                  className="sticker absolute -bottom-4 left-6 rotate-3"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Quest log */}
           <section className="pixel-panel p-5 sm:p-6">
-            <h2 className="mb-4 font-press text-[11px] uppercase text-mustard">Origin Story</h2>
+            <h2 className="mb-4 font-press text-[11px] uppercase text-mustard">Quest Log</h2>
             <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <p className="mb-2 font-press text-[9px] text-sunset">Quest Log Entry 01</p>
+                <p className="mb-2 font-press text-[9px] text-sunset">Entry 01 · Main Quest</p>
                 <p className="text-sm leading-relaxed text-foam/90">
-                  You can read a hundred papers on surfing and still wipe out on your first wave.
-                  Same deal with software. Serendira, FlockIn, a TCP analyzer from scratch in C -
-                  that is where the real XP drops. Ship first, polish later.
+                  Serendira started while I was still sorting out my course schedule. I lead
+                  engineering for a talent platform matching remote professionals across Asia
+                  with enterprise clients, and on a founding team that means design, build,
+                  deploy, and answering the bug reports too. Somewhere between the pitch deck
+                  and the first real users I stopped being precious about unfinished code.
                 </p>
               </div>
               <div>
-                <p className="mb-2 font-press text-[9px] text-sunset">Quest Log Entry 02</p>
+                <p className="mb-2 font-press text-[9px] text-sunset">Entry 02 · Side Quests</p>
                 <p className="text-sm leading-relaxed text-foam/90">
-                  From TCP packets at the bottom to React on top, the drive is full-stack
-                  curiosity. As Technical Co-founder at Serendira that meant product,
-                  infrastructure, and growth in one run. The C tools were pure side quests.
+                  The C projects are how I relax, which I understand is a strange sentence. A
+                  process manager, a FAT12 file-system tool, a TCP analyzer that rebuilds
+                  connection state from raw captures. I like knowing what the bytes are doing
+                  under all the frameworks. Then I climb back up the stack and make things
+                  like this site, a canvas doing its best impression of an ocean.
                 </p>
               </div>
             </div>
             <blockquote className="mt-6 border-4 border-ink bg-coral px-4 py-4 font-pixel text-lg leading-snug text-foam sm:text-xl">
-              &ldquo;Ship first, polish later. You can not learn to surf by reading about it.&rdquo;
+              &ldquo;Paddle out. Worst case, you swim back.&rdquo;
             </blockquote>
           </section>
 
-          {/* Photo gallery as unlocked zones */}
-          <section>
+          {/* Field journal: taped snapshots + lurking shark */}
+          <section className="relative">
             <h2 className="mb-4 font-press text-[11px] uppercase text-mustard">
-              Unlocked Zones · Life in the Swell
+              Field Journal · Life in the Swell
             </h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {[
-                { src: "/images/rahil-tofino.jpeg", alt: "Tofino surf", label: "Tofino, BC" },
-                { src: "/images/rahil-surf-shop.jpeg", alt: "Surf shop", label: "On the Boards" },
-                { src: "/images/rahil-ocean.jpeg", alt: "On the water", label: "On the Water" },
-              ].map((shot, i) => (
+            {/* the shark inspects the journal from behind the snaps */}
+            <Image
+              src="/images/shark-popup.png"
+              alt=""
+              width={150}
+              height={181}
+              aria-hidden="true"
+              className="sticker absolute -top-14 right-2 hidden rotate-6 md:block"
+            />
+            <div className="relative z-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
+              {snaps.map((shot) => (
                 <figure
                   key={shot.src}
-                  className={`pixel-panel overflow-hidden p-2 ${i === 1 ? "float-panel" : ""}`}
-                  style={i === 1 ? { animationDelay: "0.6s" } : undefined}
+                  className="snap p-2"
+                  style={{ "--tilt": shot.tilt } as CSSProperties}
                 >
-                  <div className="relative aspect-[4/5] border-2 border-ink">
-                    <Image src={shot.src} alt={shot.alt} fill sizes="280px" className="object-cover" />
+                  <span
+                    className="tape -top-3 left-1/2 z-10 h-5 w-16 -translate-x-1/2 -rotate-2"
+                    aria-hidden="true"
+                  />
+                  <div className={`relative ${shot.aspect} border-2 border-ink`}>
+                    <Image
+                      src={shot.src}
+                      alt={shot.alt}
+                      fill
+                      sizes="(min-width: 1024px) 240px, (min-width: 640px) 45vw, 90vw"
+                      className="object-cover"
+                    />
                   </div>
-                  <figcaption className="mt-2 flex items-center justify-between gap-2">
-                    <span className="font-press text-[8px] text-mustard">{shot.label}</span>
-                    <span className="font-press text-[7px] text-lime">CLEAR</span>
+                  <figcaption className="mt-2 flex items-baseline justify-between gap-2 px-1 pb-1">
+                    <span className="font-press text-[8px] uppercase text-navy">{shot.label}</span>
+                    <span className="font-pixel text-sm lowercase text-navy/70">{shot.note}</span>
                   </figcaption>
                 </figure>
               ))}
+
+              {/* found footage: the old point-and-shoot, screen still on */}
+              <figure className="snap p-2" style={{ "--tilt": "2.5deg" } as CSSProperties}>
+                <span
+                  className="tape -top-3 left-1/2 z-10 h-5 w-16 -translate-x-1/2 rotate-3"
+                  aria-hidden="true"
+                />
+                <div className="border-2 border-ink bg-paper">
+                  <Image
+                    src="/images/retro-camera.png"
+                    alt="Back of an old Canon point-and-shoot, its screen showing a 2022 skimboarding photo"
+                    width={1080}
+                    height={666}
+                    sizes="(min-width: 1024px) 240px, (min-width: 640px) 45vw, 90vw"
+                    className="w-full"
+                  />
+                </div>
+                <figcaption className="mt-2 flex items-baseline justify-between gap-2 px-1 pb-1">
+                  <span className="font-press text-[8px] uppercase text-navy">Found Footage</span>
+                  <span className="font-pixel text-sm lowercase text-navy/70">skim era, 2022</span>
+                </figcaption>
+              </figure>
             </div>
           </section>
 
           {/* Contact easter egg */}
-          <section className="pixel-panel-light p-6 text-center sm:p-8">
+          <section className="pixel-panel-light relative p-6 text-center sm:p-8">
             <p className="font-press text-[9px] uppercase text-navy/60">Secret Item Found</p>
             <h2 className="font-pixel mt-2 text-2xl uppercase text-navy sm:text-3xl">
               Message in a Bottle
@@ -235,6 +406,14 @@ export default function AboutMePage() {
             <div className="mt-4 [&_button]:font-press [&_p]:text-navy/70">
               <BottleReveal />
             </div>
+            <Image
+              src="/images/seashell.png"
+              alt=""
+              width={64}
+              height={58}
+              aria-hidden="true"
+              className="sticker absolute -left-4 -top-5 -rotate-12"
+            />
           </section>
         </main>
 

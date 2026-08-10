@@ -21,6 +21,10 @@
   --peach: #ffd9b0;
   --hotpink: #f72585;
   --lime: #a4d92c;
+  /* Deep ocean blue matching the WaveCanvas horizon. Used as the page underlay
+     so route transitions (and the beat before the canvas first paints) blend
+     into the scene instead of flashing near-white. */
+  --ocean-underlay: #1b55a8;
 }
 
 @theme inline {
@@ -50,10 +54,11 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--ocean-underlay);
 }
 
 body {
-  background: var(--sky-bottom);
+  background: var(--ocean-underlay);
   color: var(--ink);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
@@ -235,6 +240,49 @@ body {
   [style*="sail-"],
   [style*="fly-across"] {
     animation: none !important;
+  }
+}
+
+/* ----- about-me field journal (scrapbook snaps, tape, stickers) ----- */
+
+/* a taped-down photo: paper frame, ink border, hard shadow, slight tilt.
+   Tilt comes in via --tilt so hover can straighten it without knowing it. */
+.snap {
+  --tilt: 0deg;
+  position: relative;
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  background: var(--paper);
+  box-shadow: 6px 6px 0 var(--ink);
+  transform: rotate(var(--tilt));
+  transition: transform 120ms steps(3), box-shadow 120ms steps(3);
+}
+
+.snap:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+
+/* translucent masking-tape strip pinning a snap or stamp down */
+.tape {
+  position: absolute;
+  background: color-mix(in srgb, var(--sand) 82%, transparent);
+  border: 2px solid color-mix(in srgb, var(--ink) 45%, transparent);
+  pointer-events: none;
+}
+
+/* cut-out sticker: hard ink drop shadow keeps it in the 8-bit world */
+.sticker {
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(4px 4px 0 rgba(8, 51, 68, 0.5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snap,
+  .snap:hover {
+    transition: none;
+    transform: rotate(var(--tilt));
   }
 }
 
