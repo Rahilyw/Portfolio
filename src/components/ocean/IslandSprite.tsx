@@ -9,6 +9,7 @@ import {
   DISPLAY_SCALE,
   type SpriteVariant,
 } from "@/components/pixel/islandArt";
+import LighthouseBeam from "@/components/ocean/LighthouseBeam";
 
 /** ms per splash frame — a slow, lapping cadence. */
 const SPLASH_FRAME_MS = 150;
@@ -94,6 +95,8 @@ export default function IslandSprite({ variant }: { variant: SpriteVariant }) {
           />
         </>
       )}
+      {/* after dark the lantern sweeps a faint beam around the map */}
+      {variant === "lighthouse" && <LighthouseBeam />}
     </div>
   );
 }

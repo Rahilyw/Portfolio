@@ -14,7 +14,7 @@ export default function TreasureChest() {
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="group cursor-pointer rounded-2xl p-4 transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+        className="group cursor-pointer p-4 transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mustard"
         aria-label={open ? "Close the treasure chest" : "Open the treasure chest"}
       >
         <svg width="140" height="110" viewBox="0 0 140 110" fill="none" aria-hidden="true">
@@ -46,7 +46,7 @@ export default function TreasureChest() {
             </g>
           )}
         </svg>
-        <p className="mt-1 font-press text-[9px] uppercase text-ink/70 transition group-hover:text-ink">
+        <p className="mt-1 font-press text-[9px] uppercase text-foam/70 transition group-hover:text-foam">
           {open ? "GitHub badge loot!" : "Psst... open the chest"}
         </p>
       </button>

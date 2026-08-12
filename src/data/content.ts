@@ -33,7 +33,7 @@ export const islands: Island[] = [
   { slug: "experience", label: "Experience", blurb: "Where I've worked", x: 40, y: 14, variant: "lighthouse" },
   { slug: "skills", label: "Skills", blurb: "My toolbox", x: 66, y: 26, variant: "palm" },
   { slug: "education", label: "Education", blurb: "Where I've studied", x: 86, y: 12, variant: "ship" },
-  { slug: "achievements", label: "Achievements", blurb: "Buoys & trophies", x: 32, y: 67, variant: "hut" },
+  { slug: "achievements", label: "Achievements", blurb: "Quests I've cleared", x: 32, y: 67, variant: "hut" },
   { slug: "about-me", label: "About Me", blurb: "Get to know me", x: 72, y: 66, variant: "bottle" },
 ];
 
@@ -203,11 +203,11 @@ export const experience: Experience[] = [
     role: "Director of Sport",
     company: "UVic Engineering & CS Society",
     location: "Victoria, BC",
-    period: "2024 – Present",
+    period: "2024 – 2026",
     stamp: "EXEC",
     points: [
       "Elected director representing CS and engineering students within the ECSS.",
-      "Organise sport events and build community initiatives for engineering students.",
+      "Organised sport events and built community initiatives for engineering students.",
     ],
   },
   {
@@ -268,21 +268,93 @@ export const skillGroups = [
   },
 ];
 
-export const achievements = [
+export type Achievement = {
+  title: string;
+  org: string;
+  period: string;
+  detail: string;
+  link?: string;
+  linkLabel?: string;
+  icon: "podium" | "ticket" | "whistle" | "surfboard" | "rugby" | "shield" | "star";
+};
+
+/** Spotlight trophy: the podium finish. */
+export const featuredAchievement: Achievement = {
+  title: "UVEC Hackathon 2025 · 3rd Place",
+  org: "University of Victoria Engineering Competition",
+  period: "Oct 2025",
+  detail:
+    "Built SecureUSB with a team of three: a cross-platform tool for locking down external drives with USB detection, password authentication, and AES-256-GCM encryption behind a clean CLI. Owned the UI and CLI, shipped under a tight deadline, and took the podium.",
+  link: "https://github.com/Popfizz013/SecureUSB",
+  linkLabel: "View Project",
+  icon: "podium",
+};
+
+/** Quests still running — current roles and the events they power. */
+export const activeQuests: Achievement[] = [
   {
-    title: "UVEC Hackathon 2025 — 3rd Place",
+    title: "Executive of Events & Programming",
+    org: "UVic Entrepreneurship Club (UVEC)",
+    period: "2026 – Present",
     detail:
-      "SecureUSB: a secure USB drive protection system with AES-256-GCM encryption and real-time USB detection. Role: UI & CLI developer.",
-    link: "https://github.com/Popfizz013/SecureUSB",
+      "This role owns the experiences: designing and running the events that make UVEC the place to be, from hands-on workshops to flagship hackathons.",
+    icon: "ticket",
+  },
+];
+
+/** The flagship event currently being organized under the UVEC exec role. */
+export const currentObjective = {
+  title: "Cursor Codechella @ Victoria, BC",
+  date: "Aug 22, 2026",
+  detail:
+    "Organizing a one-day hackathon for 150–200 builders with the Cursor community, powered by Tenfold. No pitch theatrics: what you tried, what broke, what shipped. Prize tracks from Convex, GMI Cloud, and RevenueCat.",
+  link: "https://luma.com/cursor-victoria-canada",
+};
+
+/** Cleared side quests, flagged with buoys. */
+export const clearedQuests: Achievement[] = [
+  {
+    title: "Director of Sport",
+    org: "UVic Engineering & CS Society",
+    period: "2024 – 2026",
+    detail:
+      "Elected director who organized sport events and built community initiatives for engineering and CS students across two years on the ECSS.",
+    icon: "whistle",
   },
   {
-    title: "Director of Sport — UVic ECSS",
+    title: "Trip Coordination Executive",
+    org: "UVic Surf Club",
+    period: "Sep 2025 – Jan 2026",
     detail:
-      "Engineering & Computer Science Society leadership: organizing sport events and community for engineering students.",
+      "Organized and coordinated the club's semester surf trips, getting everyone from the classroom to the coast without losing anyone along the way.",
+    icon: "surfboard",
   },
   {
     title: "GitHub Developer Program Member",
+    org: "GitHub",
+    period: "Ongoing",
     detail: "Member of the GitHub Developer Program, building on the GitHub platform.",
+    icon: "star",
+  },
+];
+
+/** The Royal College era — an older save file from Colombo, Sri Lanka. */
+export const legacyAchievements: Achievement[] = [
+  {
+    title: "Vice-Captain · 1st XV Rugby",
+    org: "Royal College Colombo · The Tuskers",
+    period: "2019 – 2022",
+    detail:
+      "Four seasons with the Tuskers in Sri Lanka's elite Dialog Schools Rugby League. As vice-captain, led the side to victory in the Bradby Shield, the storied annual encounter against Trinity College.",
+    icon: "rugby",
+  },
+  {
+    title: "Senior Prefect",
+    org: "Royal College Colombo · Prefects' Council",
+    period: "2022 / 23",
+    detail:
+      "Appointed at the Annual General Assembly in front of 5000+ students and staff, trading the probationary card for the sterling silver badge. Helped lead student life across academics, sport, clubs, and junior leadership.",
+    icon: "shield",
   },
 ];
 
