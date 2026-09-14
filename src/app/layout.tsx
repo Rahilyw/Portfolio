@@ -6,6 +6,7 @@ import {
   Press_Start_2P,
   Titan_One,
 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { site, siteUrl } from "@/data/content";
 import "./globals.css";
 
@@ -99,6 +100,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
         {children}
+        <Analytics />
       </body>
     </html>
   );
