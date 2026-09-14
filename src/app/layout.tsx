@@ -7,6 +7,7 @@ import {
   Titan_One,
 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site, siteUrl } from "@/data/content";
 import "./globals.css";
 
@@ -101,6 +102,7 @@ export default function RootLayout({
         />
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
