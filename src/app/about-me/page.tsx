@@ -226,7 +226,7 @@ export default function AboutMePage() {
                 <div className="absolute -right-4 top-6 w-[88px] rotate-6 border-2 border-ink bg-paper p-0.5 shadow-[4px_4px_0_var(--ink)] sm:w-[104px]">
                   <Image
                     src="/images/lighthouse-stamp.jpg"
-                    alt="Sri Lankan 75-cent stamp of the Great Basses lighthouse"
+                    alt="Sri Lankan 75-cent stamp of the Galle lighthouse"
                     width={736}
                     height={1046}
                     className="w-full"
@@ -251,15 +251,23 @@ export default function AboutMePage() {
               <div className="pixel-panel relative p-5 sm:p-6">
                 <p className="mb-2 font-press text-[9px] text-sunset">Heritage Log</p>
                 <p className="max-w-prose text-sm leading-relaxed text-foam/90 sm:text-base">
-                  Wijeyesekera is a Sri Lankan name, and the island keeps pulling me back.
-                  Summer 2024 I was there interning at Innovation Quotient, turning market
-                  research into growth plans for bank boards. The surfing was strictly
-                  extracurricular. The water is thirty degrees warmer than home and nobody
-                  brags about it, which I respect.
+                  Wijeyesekera is a Sri Lankan name and Colombo is where I&apos;m from. Royal
+                  College, rugby for the Tuskers, a coastline I completely took for granted
+                  until I left it. Summer 2024 I was back interning at Innovation Quotient,
+                  turning market research into growth plans for bank boards. The surfing was
+                  strictly extracurricular.
                 </p>
                 <p className="mt-3 max-w-prose text-sm leading-relaxed text-foam/90 sm:text-base">
-                  The lighthouse on the 75-cent stamp is Great Basses, a real one off the
-                  south coast. The other stamp is king coconuts. Both grow on you.
+                  Victoria taught me to surf in water thirty degrees colder, which is its own
+                  kind of character building. Nobody back home brags about the waves.
+                  They&apos;re just there, which I respect.
+                </p>
+                <p className="mt-3 max-w-prose text-sm leading-relaxed text-foam/90 sm:text-base">
+                  The lighthouse on the 75-cent stamp is Galle, which is my favourite corner of
+                  the island and worth the drive from anywhere. The 10-cent stamp is king
+                  coconuts, the most addictive drink on earth and one you cannot get properly
+                  outside Sri Lanka. I miss both more than I expected to. Putting them on this
+                  page is how I stay in touch with where I&apos;m from.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {["Innovation Quotient · 2024", "NUS Exchange · 2025", "Tofino runs · ongoing"].map(
