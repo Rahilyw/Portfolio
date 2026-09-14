@@ -180,19 +180,20 @@ export default function AboutMePage() {
               </p>
 
               {/* found footage: the old point-and-shoot, shark reading over its shoulder */}
-              <div className="relative mt-auto pt-12">
-                <Image
-                  src="/images/shark-popup.png"
-                  alt=""
-                  width={150}
-                  height={181}
-                  aria-hidden="true"
-                  className="sticker absolute right-3 top-0 w-[88px] rotate-6 sm:w-[104px]"
-                />
+              <div className="relative mt-auto pt-16">
                 <figure
                   className="snap relative z-10 mx-auto max-w-[340px] p-2"
                   style={{ "--tilt": "2.5deg" } as CSSProperties}
                 >
+                  {/* shark takes a bite out of the top right corner */}
+                  <Image
+                    src="/images/shark-popup.png"
+                    alt=""
+                    width={150}
+                    height={181}
+                    aria-hidden="true"
+                    className="sticker absolute -right-12 -top-16 z-20 w-[140px] rotate-[18deg] sm:-right-14 sm:-top-20 sm:w-[172px]"
+                  />
                   <span
                     className="tape -top-3 left-1/2 z-10 h-5 w-16 -translate-x-1/2 rotate-3"
                     aria-hidden="true"
