@@ -161,7 +161,7 @@ export default function AboutMePage() {
         <main className="mx-auto w-full max-w-5xl flex-1 space-y-10 px-4 py-10 sm:px-6">
           {/* Stats + Vitals */}
           <div className="grid gap-6 lg:grid-cols-2">
-            <section className="pixel-panel p-5">
+            <section className="pixel-panel flex flex-col p-5">
               <h2 className="mb-4 flex items-center gap-2 font-press text-[11px] uppercase text-mustard">
                 <Seashell /> Attribute Points
               </h2>
@@ -178,6 +178,41 @@ export default function AboutMePage() {
               <p className="mt-4 font-press text-[8px] leading-relaxed text-foam/55">
                 Self-reported. Recalibrated after every wipeout.
               </p>
+
+              {/* found footage: the old point-and-shoot, shark reading over its shoulder */}
+              <div className="relative mt-auto pt-12">
+                <Image
+                  src="/images/shark-popup.png"
+                  alt=""
+                  width={150}
+                  height={181}
+                  aria-hidden="true"
+                  className="sticker absolute right-3 top-0 w-[88px] rotate-6 sm:w-[104px]"
+                />
+                <figure
+                  className="snap relative z-10 mx-auto max-w-[340px] p-2"
+                  style={{ "--tilt": "2.5deg" } as CSSProperties}
+                >
+                  <span
+                    className="tape -top-3 left-1/2 z-10 h-5 w-16 -translate-x-1/2 rotate-3"
+                    aria-hidden="true"
+                  />
+                  <div className="border-2 border-ink bg-paper">
+                    <Image
+                      src="/images/retro-camera.png"
+                      alt="Back of an old Canon point-and-shoot, its screen showing a 2022 skimboarding photo"
+                      width={1080}
+                      height={666}
+                      sizes="(min-width: 1024px) 340px, 90vw"
+                      className="w-full"
+                    />
+                  </div>
+                  <figcaption className="mt-2 flex items-baseline justify-between gap-2 px-1 pb-1">
+                    <span className="font-press text-[8px] uppercase text-navy">Found Footage</span>
+                    <span className="font-pixel text-sm lowercase text-navy/70">fooling around!</span>
+                  </figcaption>
+                </figure>
+              </div>
             </section>
 
             <section className="pixel-panel p-5">
@@ -332,21 +367,12 @@ export default function AboutMePage() {
             </blockquote>
           </section>
 
-          {/* Field journal: taped snapshots + lurking shark */}
+          {/* Field journal: taped snapshots */}
           <section className="relative">
             <h2 className="mb-4 font-press text-[11px] uppercase text-mustard">
               Field Journal · Life in the Swell
             </h2>
-            {/* the shark inspects the journal from behind the snaps */}
-            <Image
-              src="/images/shark-popup.png"
-              alt=""
-              width={150}
-              height={181}
-              aria-hidden="true"
-              className="sticker absolute -top-14 right-2 hidden rotate-6 md:block"
-            />
-            <div className="relative z-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
+            <div className="relative z-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:items-start">
               {snaps.map((shot) => (
                 <figure
                   key={shot.src}
@@ -362,7 +388,7 @@ export default function AboutMePage() {
                       src={shot.src}
                       alt={shot.alt}
                       fill
-                      sizes="(min-width: 1024px) 240px, (min-width: 640px) 45vw, 90vw"
+                      sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
                       className="object-cover"
                     />
                   </div>
@@ -372,28 +398,6 @@ export default function AboutMePage() {
                   </figcaption>
                 </figure>
               ))}
-
-              {/* found footage: the old point-and-shoot, screen still on */}
-              <figure className="snap p-2" style={{ "--tilt": "2.5deg" } as CSSProperties}>
-                <span
-                  className="tape -top-3 left-1/2 z-10 h-5 w-16 -translate-x-1/2 rotate-3"
-                  aria-hidden="true"
-                />
-                <div className="border-2 border-ink bg-paper">
-                  <Image
-                    src="/images/retro-camera.png"
-                    alt="Back of an old Canon point-and-shoot, its screen showing a 2022 skimboarding photo"
-                    width={1080}
-                    height={666}
-                    sizes="(min-width: 1024px) 240px, (min-width: 640px) 45vw, 90vw"
-                    className="w-full"
-                  />
-                </div>
-                <figcaption className="mt-2 flex items-baseline justify-between gap-2 px-1 pb-1">
-                  <span className="font-press text-[8px] uppercase text-navy">Found Footage</span>
-                  <span className="font-pixel text-sm lowercase text-navy/70">skim era, 2022</span>
-                </figcaption>
-              </figure>
             </div>
           </section>
 
